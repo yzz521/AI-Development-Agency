@@ -1,12 +1,18 @@
 # Version
 
-Current version: v1.2
+Current integration package: v1.2 + Tool Adapters
 
-## 本版本核心变化
+核心版本仍为 **v1.2**。
 
-- 全部 Agent 改为中文描述。
-- Agent 增加 YAML frontmatter。
-- Agent 从“职位说明”升级为“可直接加载的角色 Prompt”。
-- 每个 Agent 明确：身份、使命、能力、读取内容、工作方法、决策原则、硬约束、不负责范围、输出、完成标准、协作方式。
-- 保留现有 Rules / Workflow / Context / Contracts / Artifacts / Validation。
-- 明确本项目当前不是 Multi-Agent Runtime，避免把“读取多个 MD”误解成“自动启动多个独立 Agent”。
+本次新增：
+
+- `adapters/`
+  - Codex 接入指南
+  - Reasonix 接入指南
+  - DeepSeek Harness 接入指南
+  - 统一接入流程
+- `templates/project-AGENTS.md`
+- `docs/工具接入说明.md`
+- `docs/examples/示例-医保审核规则功能.md`
+
+本次不新增 Agent，不改变现有 Agent 定义。
