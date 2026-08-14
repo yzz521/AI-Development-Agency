@@ -1,145 +1,183 @@
-# AI Development Agency — 总控规则
+# AI Development Agency — 总控规则 v1.1
 
-## 1. 目标
+## 1. 定位
 
-本仓库不是一个运行时框架，而是一套面向软件研发的 Agent 角色、工程规范、工作流与项目上下文定义。任何接入 Claude Code、Codex、Cursor、Gemini CLI、OpenCode 等工具的 AI，都应优先把本文件作为任务路由入口。
+本仓库是一套“AI 软件研发团队定义”，由以下四层组成：
 
-## 2. 四个核心概念
+- **Agent**：谁来干。
+- **Rule**：怎么干。
+- **Workflow**：按什么顺序干。
+- **Context**：在什么背景下干。
 
-- **Agent**：谁来干。每个 `agents/**/*.md` 定义一个专业角色。
-- **Rule**：怎么干。每个 `rules/*.md` 定义项目统一工程标准。
-- **Workflow**：按什么顺序干。每个 `workflows/*.md` 定义具体任务的协作流程。
-- **Context**：在什么背景下干。每个 `context/*.md` 定义项目、架构、技术栈、医疗业务等稳定事实。
+`AGENTS.md` 是任务入口与路由规则，不是业务代码，也不是运行时框架。
 
-## 3. 总体执行顺序
+## 2. 执行原则
 
-收到任务后，必须按以下顺序处理：
+收到任务后，先执行“任务识别”，再选择最小必要流程与 Agent。
 
-1. 读取 `context/project.md`、`context/technology-stack.md`。
-2. 判断任务类型：需求、功能开发、Bug、重构、数据库、AI、UI、发布等。
-3. 选择一个主 Workflow；不确定时使用 `workflows/feature-development.md` 的最小变更原则。
-4. 根据 Workflow 选择必要 Agent，不相关角色不得无意义参与。
-5. Agent 执行前读取对应 `rules/*.md`。
-6. 读取已有代码、配置、数据库结构和测试，不凭空假设。
-7. 完成实现后执行 QA / Security / Code Review 所需的检查。
-8. 最终由 AI Tech Lead 汇总变更、风险、验证结果与后续事项。
+必须遵循：
 
-## 4. Agent 选择规则
+1. 先读当前代码、配置、测试和相关上下文，禁止凭空假设。
+2. 先判断风险级别，再决定是否需要架构、数据库、安全和完整回归。
+3. 只加载与任务相关的 Agent / Rule / Context，避免无意义地塞入全部知识。
+4. Agent 之间必须通过标准 Artifact 交接，不得只依赖自然语言上下文。
+5. 任何实现类 Agent 都必须有验证步骤。
+6. Review / QA 失败时进入 REWORK，不得直接宣布完成。
+7. 高风险任务必须有回滚策略。
+8. 默认最小改动，禁止借任务名义进行无关重构。
 
-### 4.1 产品需求
-使用：
-- `product-manager`
-- `requirements-analyst`
-- `project-manager`（涉及排期、跨团队协调时）
-
-### 4.2 UI / UX
-使用：
-- `ui-designer`
-- `ux-designer`
-- `design-reviewer`
-
-### 4.3 Vue
-使用：
-- `vue-developer`
-- `frontend-reviewer`
-
-### 4.4 React
-使用：
-- `react-developer`
-- `frontend-reviewer`
-
-### 4.5 Java
-使用：
-- `java-architect`（涉及模块、接口、领域设计或架构变化）
-- `java-developer`
-- `code-reviewer`
-
-### 4.6 Python / AI
-使用：
-- `python-developer`
-- `ai-engineer`
-- `prompt-engineer`
-- `rag-engineer`
-
-### 4.7 SQL Server
-使用：
-- `sqlserver-dba`
-- `sqlserver-performance`
-- `sql-reviewer`
-
-### 4.8 医疗业务
-使用：
-- `healthcare-domain-expert`
-- `drg-dip-expert`
-- `medical-insurance-reviewer`
-
-### 4.9 质量与安全
-视风险调用：
-- `qa-engineer`
-- `api-tester`
-- `code-reviewer`
-- `security-reviewer`
-
-## 5. 任务分级
+## 3. 任务分级
 
 ### L1 — 小改动
-单文件、低风险、无数据结构变化。
 
-直接执行相关 Agent + 对应 Rule + 最小验证。
+单文件、低风险、不改变数据结构、不改变公共 API。
+
+执行：
+- 相关 Agent
+- 相关 Rule
+- 最小验证
 
 ### L2 — 常规功能
-涉及前后端、接口、数据库中的一个以上层次。
 
-必须使用 Workflow，并至少经过一次 Code Review 或测试验证。
+涉及多个文件或两个以上技术层次，例如前端 + 后端、接口 + 数据库。
 
-### L3 — 高风险变更
-涉及数据迁移、核心医保规则、鉴权、批量数据、生产性能、AI 决策链路等。
+执行：
+- 主 Workflow
+- 至少一次 QA 或 Code Review
+- 必要时 Architecture Review
+
+### L3 — 高风险
+
+涉及以下任一情况：
+
+- 数据迁移
+- 核心医保 / DRG / DIP 规则
+- 鉴权与敏感数据
+- 大批量数据
+- 生产性能
+- 核心 AI 决策链路
+- 破坏性 API / Schema 变化
 
 必须：
 - Architecture Review
 - Implementation
 - QA
-- Security（适用时）
+- Security Review（适用时）
 - Code Review
-- 明确回滚方案
+- Rollback Plan
+- 明确验证证据
 
-## 6. 全局硬规则
+## 4. Agent 路由
 
-1. 不猜现有代码结构，先读代码。
-2. 不为了“看起来更高级”进行无关重构。
-3. 不擅自替换既有技术栈。
-4. 不使用 Map 作为跨层业务参数对象；优先 DTO / Command / Query / Value Object。
-5. 不使用魔法值；使用 Enum、Constants 或配置。
-6. 数据库变更必须考虑索引、数据量、锁、事务、回滚和兼容性。
-7. 医疗、医保、DRG/DIP 规则类结论必须区分“业务规则”与“技术实现”，不能把模型生成内容当作政策原文。
-8. 涉及敏感医疗数据时，默认遵守最小权限、脱敏、审计、数据最小化原则。
-9. 每次完成任务都应说明：改了什么、为什么、如何验证、剩余风险。
-10. 默认最小改动；只有明确要求时才进行大规模重构。
+| 任务 | 主 Agent | 可选 Agent |
+|---|---|---|
+| 产品需求 | product-manager | requirements-analyst, project-manager |
+| UI / UX | ui-designer | ux-designer, design-reviewer |
+| Vue | vue-developer | frontend-reviewer |
+| React | react-developer | frontend-reviewer |
+| Java | java-developer | java-architect, code-reviewer |
+| Python | python-developer | api-designer, code-reviewer |
+| AI / LLM | ai-engineer | prompt-engineer, rag-engineer |
+| 多 Agent | multi-agent-architect | ai-tech-lead |
+| SQL Server | sqlserver-dba | sqlserver-performance, sql-reviewer |
+| 医疗 | healthcare-domain-expert | drg-dip-expert, medical-insurance-reviewer |
+| 测试 | qa-engineer | api-tester |
+| 安全 | security-reviewer | sql-reviewer, code-reviewer |
+| 架构 | software-architect | ai-tech-lead |
+| 代码理解 | codebase-onboarding | 对应领域 Agent |
+| 总控 | ai-tech-lead | 所有领域 Agent |
 
-## 7. 冲突处理
+## 5. 标准执行状态
 
-优先级从高到低：
+所有 Workflow 任务统一使用：
+
+`PENDING → ANALYZING → IN_PROGRESS → WAITING_REVIEW → PASS → DONE`
+
+失败：
+
+`FAILED → REWORK → IN_PROGRESS`
+
+阻塞：
+
+`BLOCKED`
+
+规则：
+- 没有验证证据不得进入 `PASS`。
+- Reviewer / QA 出现 blocker 时必须进入 `REWORK`。
+- `DONE` 必须有最终交付摘要。
+
+## 6. 标准交接
+
+Agent 完成后必须产出至少一个 Artifact，格式遵循：
+
+`contracts/artifact-contract.md`
+
+最少包含：
+- 任务
+- 输入
+- 修改 / 决策
+- 输出文件
+- 验证方式
+- 风险
+- 下一 Agent
+- 未完成事项
+
+## 7. Rules 加载
+
+默认：
+
+1. `rules/global.md`
+2. 当前领域 Rule
+3. `rules/security.md`（敏感 / 高风险时）
+4. `rules/healthcare.md`（医疗业务时）
+
+技术领域映射：
+
+- Java → `rules/java.md`
+- Vue → `rules/vue.md`
+- React → `rules/react.md`
+- Python → `rules/python.md`
+- AI → `rules/ai.md`
+- SQL Server → `rules/sqlserver.md`
+- 医疗 → `rules/healthcare.md`
+
+## 8. Context 加载
+
+默认读取：
+- `context/project.md`
+- `context/technology-stack.md`
+
+需要时再读取：
+- `context/architecture.md`
+- `context/domain.md`
+
+任务特定资料放在项目实际工作目录，不污染稳定 Context。
+
+## 9. 冲突优先级
 
 1. 用户当前明确需求
-2. 项目现有架构与兼容性要求
+2. 当前项目现有架构与兼容性
 3. `rules/*.md`
-4. Workflow 要求
-5. Agent 个性与偏好
+4. Workflow
+5. Agent 偏好
 6. 通用最佳实践
 
-如果无法同时满足，记录冲突并选择风险更低、可验证、可回滚的方案。
+无法同时满足时，选择更安全、可验证、可回滚的方案，并记录冲突。
 
-## 8. 最终交付格式
+## 10. 最终交付
 
-每项任务至少汇报：
+最终至少汇报：
 
 ```text
 任务：
-方案：
+任务级别：
+Workflow：
 涉及 Agent：
-涉及文件：
+涉及 Artifact：
 关键变更：
 验证方式：
+验证结果：
 风险：
+回滚方案：
 未完成事项：
 ```

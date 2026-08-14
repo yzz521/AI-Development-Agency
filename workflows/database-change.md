@@ -1,9 +1,26 @@
-# Database Change Workflow
+# Database Change Workflow v1.1
 
-1. 确认业务需求和现有数据结构。
-2. `sqlserver-dba` 设计 DDL / Index / Migration。
-3. `sqlserver-performance` 评估大表、锁和执行计划影响。
-4. 应用 Agent 同步修改数据访问代码。
-5. `sql-reviewer` 检查 SQL。
-6. QA 验证数据一致性与回归。
-7. 输出明确回滚方案。
+## Input
+- 变更目标
+- 现有 Schema
+- 数据量
+- 性能要求
+
+## Stages
+1. `requirements-analyst` → 变更需求
+2. `sqlserver-dba` → DDL / Index / Migration
+3. `sqlserver-performance` → 性能与锁风险
+4. `sql-reviewer` → SQL 安全与正确性
+5. `qa-engineer` → Migration Validation
+6. `ai-tech-lead` → Rollback / Impact Review
+
+## Required
+- 前置检查 SQL
+- DDL
+- Rollback SQL
+- 数据校验 SQL
+- 锁 / 阻塞风险
+- 向后兼容说明
+
+## 禁止
+没有回滚方案时，不得将高风险 Schema 变更标记为 PASS。

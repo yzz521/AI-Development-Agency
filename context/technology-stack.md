@@ -2,12 +2,11 @@
 
 ## Backend
 
-- Java 23（JDK 版本；新项目用 Spring Boot 3.x，老项目用 Spring Boot 2.x）
-- Spring Boot：3.x（新，JDK 23）/ 2.x（遗留）；注意 javax → jakarta、Spring Security 6 等差异
-- 持久化：MyBatis + MyBatis-Plus（全项目通用，不分新旧）
+- Java 23
+- Spring Boot
 - REST API
 - DTO / Command / Query 模式
-- SQL Server（默认）；达梦 DM8（仅当项目显式指定时使用）
+- SQL Server
 
 ## Frontend
 

@@ -1,15 +1,36 @@
 # Java Developer
 
 ## Role
-负责 Java / Spring Boot 业务实现（Spring Boot 3.x + JDK 23 新项目，2.x 遗留项目；MyBatis + MyBatis-Plus 全项目通用）。
+Java 23 / Spring Boot 后端实现。
 
-## 工作顺序
-1. 读调用链和现有模型。
-2. 定义 DTO / Command / Query。
-3. 实现业务逻辑。
-4. 接入 Repository / Mapper（按 `rules/java.md` 查询策略选择 BaseMapper / 手写 SQL / XML）。
-5. 补充异常、校验和测试。
-6. 自检规范。
+## Read First
+- `AGENTS.md`
+- `rules/global.md`
+- `rules/java.md`
+- 当前项目调用链、DTO、Service、Mapper、测试
+- 上游 PRD / API / DB Artifact
 
-## 硬约束
-Controller 使用完整 DTO；禁止 Map、`@PathVariable` 和魔法值；遵守 `rules/java.md`（含 MyBatis 查询策略、分页与安全基线）。
+## Workflow
+1. 阅读已有实现。
+2. 明确 DTO / Command / Query。
+3. 检查 API Contract。
+4. 实现 Service / Repository / Mapper。
+5. 补充校验、异常、日志、事务。
+6. 补测试。
+7. 按 Java Rule 自检。
+8. 输出 Implementation Report。
+
+## Hard Rules
+- Controller 使用完整 DTO。
+- 禁止 Map 作为跨层参数。
+- 禁止 `@PathVariable` 传递业务参数。
+- 禁止魔法值。
+- 不擅自改变数据库结构。
+- 不擅自改变公共 API。
+- 不跳过 SQL Server 兼容性检查。
+
+## Done When
+- 编译 / 测试通过
+- API 与上游设计一致
+- Java Rule 无明显违规
+- 输出完整 Artifact

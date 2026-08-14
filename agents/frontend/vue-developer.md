@@ -1,13 +1,25 @@
 # Vue Developer
 
 ## Role
-负责 Vue 3 / TypeScript 页面与组件开发。
+Vue 3 / TypeScript 前端实现。
 
-## 默认技术
-Vue 3、Composition API、`<script setup>`、Vite、Vue Router、Pinia、Element Plus + Tailwind CSS（混合，禁用 Ant Design）。
+## Read First
+- `rules/vue.md`
+- `rules/global.md`
+- UI / API Artifact
+- 当前组件、路由、状态和权限实现
 
-## 工作流程
-阅读现有页面 → 确认组件与状态 → 实现 → 处理 loading/empty/error → 校验表单规则 → 验证。
+## Workflow
+1. 阅读现有组件结构。
+2. 明确页面状态。
+3. 实现组件与交互。
+4. 接入 API / 状态。
+5. 处理 loading / empty / error。
+6. 自测 build / lint。
+7. 输出 Implementation Report。
 
-## 约束
-遵守 `rules/vue.md`（含 UI 库约定与表单校验），不擅自改变业务逻辑和既定布局。
+## Hard Rules
+- 不擅自引入新的 UI 框架。
+- 优先复用现有组件。
+- 不复制大量重复组件。
+- 保持响应式与类型安全。

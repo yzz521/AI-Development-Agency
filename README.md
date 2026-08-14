@@ -2,11 +2,53 @@
 
 面向企业软件研发的 AI 虚拟团队定义仓库。
 
-## 定位
+本版本在原有 Agent / Rule / Workflow / Context 四层结构基础上，加入：
 
-本项目借鉴 `agency-agents` 的 Agent-as-Markdown 思路，但不复制其完整 Agent 库。目标是形成适配当前研发体系的“角色 + 规范 + 工作流 + 上下文”基础设施。
+- 标准 Agent Contract
+- 标准 Workflow Contract
+- 标准 Artifact Contract
+- Task Contract
+- 交付物模板
+- Definition of Done
+- Validation 规则
+- Agent 生命周期与协作文档
 
-适用技术与业务范围：
+## 核心模型
+
+```text
+AGENTS.md
+   ↓
+任务识别
+   ↓
+Workflow
+   ↓
+Agent
+   ↓
+Rules + Context
+   ↓
+Artifact
+   ↓
+QA / Security / Review
+   ↓
+Validation
+   ↓
+Final Result
+```
+
+## 使用
+
+将本仓库作为项目级 AI 研发规范目录。
+
+AI 在接到任务后：
+1. 读取 `AGENTS.md`
+2. 选择 Workflow
+3. 加载必要 Agent
+4. 加载对应 Rules / Context
+5. 按 Artifact Contract 交接
+6. 进行 QA / Review / Validation
+7. 形成最终交付摘要
+
+## 技术范围
 
 - Java 23 / Spring Boot
 - Vue 3 / TypeScript
@@ -14,30 +56,15 @@
 - Python
 - SQL Server
 - AI / LLM / Agent / RAG / OCR
-- 医疗信息化、医保审核、DRG/DIP
-
-## 目录
-
-```text
-AGENTS.md       # 总控和任务路由
-agents/         # AI 专业角色
-rules/          # 工程与业务规则
-workflows/      # 常见研发流程
-context/        # 稳定项目上下文
-```
-
-## 使用方式
-
-将本仓库作为项目级 AI 规范目录，让 AI 在开始任务前读取 `AGENTS.md`。当任务进入具体领域时，再读取对应 Agent、Rule、Workflow 和 Context。
+- 医疗信息化
+- 医保审核
+- DRG / DIP
 
 ## 设计原则
 
-- 角色职责与技术规范分离
-- 通用规范与项目上下文分离
-- 高风险变更必须经过验证与审查
-- 最小变更优先
-- 可追踪、可复盘、可持续演进
-
-## 与 agency-agents 的关系
-
-`agency-agents` 可以作为外部 Agent 人才库和灵感来源；本仓库承担企业内部适配层。新增 Agent 时优先复用成熟的方法论，再根据本项目技术栈、业务规则和团队习惯进行重写。
+- 角色、规则、流程、上下文分离
+- 最小必要上下文
+- 可验证交付
+- 失败可回退
+- 高风险变更可追踪
+- 通用能力与项目事实分离

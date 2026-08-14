@@ -9,6 +9,3 @@
 7. 所有异步请求考虑 loading、empty、error、retry 状态。
 8. 表格、筛选、分页组件优先复用已有项目模式。
 9. 不为了视觉效果改变原有业务逻辑和页面布局，除非需求明确要求。
-10. UI 库采用 **Tailwind CSS + Element Plus 混合**：Tailwind 负责布局/间距/卡片/样式，Element Plus 负责复杂交互组件（表格、日期选择、消息提示）。
-11. **禁用 Ant Design**（Vue 项目）。
-12. 表单必须带校验规则（`el-form` rules），提交前校验通过才发请求。
