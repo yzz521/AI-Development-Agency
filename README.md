@@ -1,44 +1,467 @@
-# AI Development Agency — 项目初始化脚本
+# AI Development Agency
 
-## 批量接入
+> 面向企业软件研发的 AI 虚拟研发团队规范库。  
+> 当前版本：**v1.2**
 
-```bash
-cd ~/workspace/AI-Development-Agency
-./scripts/init-all.sh ~/workspace
+AI Development Agency 不是新的 AI Coding Runtime，也不是把多个 Agent 强行绑定在一起的框架。
+
+它是一套可以被 **Codex、Reasonix、DeepSeek Harness** 等 AI Coding 工具共同使用的“AI 研发团队规范”：把研发岗位、技术规则、工作流程和项目背景整理成结构化 Markdown，让 AI 在真实项目中按照统一方法完成研发工作。
+
+## 1. 核心理念
+
+把软件研发拆成四个核心维度：
+
+| 层次     | 解决的问题     | 目录         |
+| -------- | -------------- | ------------ |
+| Agent    | 谁来做         | `agents/`    |
+| Rule     | 怎么做         | `rules/`     |
+| Workflow | 按什么顺序做   | `workflows/` |
+| Context  | 在什么背景下做 | `context/`   |
+
+核心关系：
+
+```text
+任务
+ ↓
+判断任务类型 / 风险等级
+ ↓
+选择 Agent
+ ↓
+加载 Rule
+ ↓
+选择 Workflow
+ ↓
+读取真实项目代码
+ ↓
+实现
+ ↓
+测试 / Review
+ ↓
+汇报结果
 ```
 
-## 单个项目
+所以本仓库不是简单的 Prompt 集合，而是一套可复用的 AI 研发角色与研发流程规范。
 
-```bash
-./scripts/init-project.sh ../project-a
+## 2. 重要边界
+
+**当前仓库不是 Multi-Agent Runtime。**
+
+`AGENTS.md` 和各 Markdown 文件负责：
+
+- 定义角色
+- 定义研发规则
+- 定义工作流程
+- 定义项目上下文
+- 指导 AI 如何选择和使用这些内容
+
+但：
+
+> “读取多个 Markdown 文件”不等于运行时已经真正启动多个独立 Agent。
+
+真正的 Agent 调度、Subagent 并行和任务编排由具体 AI Coding 工具负责。
+
+当前版本优先保证：
+
+> **每一个 Agent 单独加载，也能够完成自己的工作。**
+
+未来如果需要，再根据具体 Runtime 能力增加编排层，而不是让核心 Agent 与某一个工具绑定。
+
+## 3. 仓库结构
+
+```text
+AI-Development-Agency/
+│
+├── AGENTS.md                 # 总控规则 / AI 入口
+├── agents/                   # AI 研发岗位
+│   ├── ai/                   # AI / Prompt / RAG / Multi-Agent
+│   ├── backend/              # Java / Python / API
+│   ├── database/             # SQL Server / SQL Review
+│   ├── design/               # UI / UX / Design Review
+│   ├── frontend/             # Vue / React / 前端 Review
+│   ├── healthcare/           # 医疗 / DRG-DIP / 医保审核
+│   ├── leadership/           # Tech Lead / 架构 / 项目理解
+│   ├── product/              # 产品 / 需求 / 项目管理
+│   └── quality/              # QA / 测试 / Review / Security
+│
+├── rules/                    # 通用技术与研发规则
+├── workflows/                # 常见研发流程
+├── context/                  # 项目与技术背景
+├── adapters/                 # Codex / Reasonix / DeepSeek Harness
+├── contracts/                # Agent / Workflow 输出约定
+├── artifacts/                # 标准研发产物
+└── validation/               # 验证与质量检查
 ```
 
-## 检查
+## 4. 当前覆盖的角色
 
-```bash
-./scripts/doctor.sh ../project-a
+### 产品
+
+- Product Manager
+- Requirements Analyst
+- Project Manager
+
+### UI / UX
+
+- UI Designer
+- UX Designer
+- Design Reviewer
+
+### 前端
+
+- Vue Developer
+- React Developer
+- Frontend Reviewer
+
+### 后端
+
+- Java Architect
+- Java Developer
+- Python Developer
+- API Designer
+
+### AI
+
+- AI Engineer
+- Prompt Engineer
+- RAG Engineer
+- Multi-Agent Architect
+
+### 数据库
+
+- SQL Server DBA
+- SQL Server Performance
+- SQL Reviewer
+
+### 医疗
+
+- Healthcare Domain Expert
+- DRG/DIP Expert
+- Medical Insurance Reviewer
+
+### 质量 / 架构
+
+- QA Engineer
+- API Tester
+- Code Reviewer
+- Security Reviewer
+- AI Tech Lead
+- Software Architect
+- Codebase Onboarding
+
+完整角色以 `agents/` 目录实际文件为准。
+
+## 5. 当前支持的 AI Coding 工具
+
+通过 `adapters/` 提供接入说明，目前包括：
+
+- **Codex**
+- **Reasonix**
+- **DeepSeek Harness**
+
+统一关系：
+
+```text
+                 AI Development Agency
+                           │
+          ┌────────────────┼────────────────┐
+          ↓                ↓                ↓
+       Codex            Reasonix      DeepSeek Harness
+          │                │                │
+          └────────────────┼────────────────┘
+                           ↓
+                  读取同一套 Agent / Rule
 ```
 
-## 递归扫描
+**工具是运行层，Agency 是规范层。**
 
-```bash
-RECURSIVE=1 ./scripts/init-all.sh ~/workspace
+不要为了适配某一个工具，把完整 Agent Prompt 复制到工具自己的配置目录中。
+
+## 6. 如何接入真实项目
+
+推荐采用：
+
+> **中央 Agency + 项目级 `AGENTS.md` + `.ai/agency` 稳定入口**
+
+例如：
+
+```text
+~/workspace/
+│
+├── AI-Development-Agency/
+│
+├── project-a/
+│   ├── AGENTS.md
+│   └── .ai/
+│       └── agency -> ../AI-Development-Agency
+│
+├── project-b/
+│   ├── AGENTS.md
+│   └── .ai/
+│       └── agency -> ../AI-Development-Agency
+│
+└── project-c/
+    ├── AGENTS.md
+    └── .ai/
+        └── agency -> ../AI-Development-Agency
 ```
 
-## 删除链接
-
-```bash
-./scripts/remove-link.sh ../project-a
-```
-
-## 核心约定
-
-每个项目统一使用：
+项目统一通过：
 
 ```text
 .ai/agency/
 ```
 
-作为 AI Development Agency 的稳定入口。
+访问中央 Agency。
 
-中央仓库位置可以变化，项目内不保存绝对路径。
+**不要在项目 `AGENTS.md` 中写死中央仓库的绝对路径。**
+
+这样移动整个 workspace、换目录或者换电脑时，不需要重新修改大量路径。
+
+## 7. 项目级 AGENTS.md 的职责
+
+中央 Agency 负责通用规范，项目自己的 `AGENTS.md` 负责项目特有信息：
+
+```text
+项目 AGENTS.md
+│
+├── 项目是什么
+├── 当前技术栈
+├── 项目特殊规则
+├── 构建 / 测试命令
+├── 数据库说明
+└── .ai/agency 入口
+```
+
+不要把中央 Agency 的所有规则复制进每个项目。
+
+推荐关系：
+
+```text
+中央 Agency
+    ↓
+通用 Agent / Rule / Workflow
+    ↓
+项目 AGENTS.md
+    ↓
+真实项目代码
+```
+
+## 8. 一个典型任务
+
+例如：
+
+> 给现有 Java 医保审核系统增加一个规则查询接口。
+
+执行思路：
+
+```text
+1. 读取项目 AGENTS.md
+        ↓
+2. 读取 Agency 总控规则
+        ↓
+3. 判断任务等级
+        ↓
+4. 选择 Java Developer
+        ↓
+5. 选择 Medical Insurance Reviewer（需要时）
+        ↓
+6. 加载 Java / SQL Server Rule
+        ↓
+7. 选择 Feature Development Workflow
+        ↓
+8. 阅读 Controller / Service / Repository / SQL
+        ↓
+9. 实现
+        ↓
+10. 测试
+        ↓
+11. Code Review / QA
+        ↓
+12. 汇报修改、验证和风险
+```
+
+对于简单任务，不需要强行加载所有 Agent。
+
+核心原则：
+
+> **选择最小必要 Agent，而不是 Agent 越多越好。**
+
+## 9. 风险等级
+
+### L1 — 低风险
+
+- 单文件修改
+- 小范围 Bug 修复
+- 不改变公共 API
+- 不改变数据库 Schema
+
+使用对应 Agent + Rule + 最小验证即可。
+
+### L2 — 中风险
+
+- 跨模块开发
+- 前后端联动
+- 多技术层修改
+- 较大范围重构
+
+需要 Workflow，并至少进行一次 QA 或 Code Review。
+
+### L3 — 高风险
+
+- 数据库迁移
+- 核心医保规则
+- 权限系统
+- 敏感医疗数据
+- 大批量数据处理
+- 核心 AI 决策
+- 核心架构调整
+
+根据实际情况增加：
+
+- Architecture Review
+- QA
+- Security Review
+- Code Review
+- Rollback 方案
+- 验证证据
+
+## 10. 全局研发原则
+
+1. **先读代码，再修改。**
+2. 不凭空假设现有结构。
+3. 默认最小改动。
+4. 禁止无关重构。
+5. 不擅自替换技术栈。
+6. 禁止用 Map 代替明确业务对象。
+7. 禁止魔法值。
+8. 数据库变更必须考虑索引、锁、事务、回滚和兼容性。
+9. 医疗业务必须区分正式规则、业务事实和模型推断。
+10. 敏感医疗数据遵守最小权限、脱敏和审计原则。
+11. 完成任务后必须说明修改内容、验证方式和风险。
+
+## 11. 三种工具怎么分工
+
+### Codex
+
+更适合：
+
+- 日常编码
+- Bug 修复
+- 重构
+- 测试
+- Code Review
+- 多文件代码修改
+
+进入具体项目后，让 Codex 读取项目 `AGENTS.md`，再按任务加载 Agency 中的 Agent / Rule / Workflow。
+
+### Reasonix
+
+更适合：
+
+- 复杂任务分析
+- 任务拆解
+- Subagent 协作
+- 复杂代码理解
+- Review
+
+可以把 Agency 中的 Agent 定义作为 Reasonix 的角色 / Profile / 上下文来源。
+
+### DeepSeek Harness
+
+更适合：
+
+- 使用 DeepSeek 模型进行研发任务
+- 自定义 Harness / Tool / Context
+- 将 Agency 作为上层研发规范
+
+具体接入方式：
+
+```text
+adapters/deepseek-harness.md
+```
+
+## 12. 当前阶段暂时不做什么
+
+为了避免过早复杂化，当前阶段暂时不做：
+
+- 不新增大量 Agent
+- 不把 Agency 改造成完整 Multi-Agent Runtime
+- 不绑定某一个 AI Coding 工具
+- 不复制 Agent Prompt 到多个工具目录
+- 不引入复杂中心化调度服务
+- 不为了“看起来像 Agent 平台”而增加不必要的代码
+
+当前最重要的是：
+
+> **先让 Agent / Rule / Workflow 真正进入日常研发，并验证它是否能够稳定提升开发质量。**
+
+## 13. 推荐使用顺序
+
+```text
+第一阶段
+项目 AGENTS.md
+      ↓
+AI Development Agency
+      ↓
+Codex / Reasonix / DeepSeek Harness
+
+第二阶段
+真实项目持续使用
+      ↓
+发现问题
+      ↓
+补充 Rule / Workflow
+
+第三阶段
+积累稳定研发模式
+      ↓
+再考虑 Runtime / 自动编排
+```
+
+不要一开始就做复杂的 Agent 平台。
+
+先把：
+
+> **规范 → AI → 代码 → 验证**
+
+这个闭环真正跑通。
+
+## 14. 最终目标
+
+```text
+                 人
+                 │
+                 ↓
+              提出需求
+                 │
+                 ↓
+        ┌────────────────────┐
+        │ AI Development     │
+        │ Agency             │
+        └────────────────────┘
+                 │
+       ┌─────────┼─────────┐
+       ↓         ↓         ↓
+     Agent      Rule    Workflow
+       │         │         │
+       └─────────┼─────────┘
+                 ↓
+        Codex / Reasonix /
+        DeepSeek Harness
+                 ↓
+             真实项目代码
+                 ↓
+          Test / QA / Review
+                 ↓
+              可交付结果
+```
+
+**Agency 定义“应该怎样研发”，AI Coding 工具负责“真正去执行”。**
+
+## 15. 仓库
+
+GitHub：
+
+https://github.com/yzz521/AI-Development-Agency
+
+当前阶段优先保持架构稳定，基于真实研发场景持续验证，再决定是否增加新的 Agent、Workflow 或 Runtime 能力。
