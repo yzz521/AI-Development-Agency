@@ -1,7 +1,7 @@
 # AI Development Agency
 
 > 面向企业软件研发的 AI 虚拟研发团队规范库。  
-> 当前版本：**v1.3**
+> 当前版本：**v1.4.0**
 
 AI Development Agency 不是新的 AI Coding Runtime，也不是把多个 Agent 强行绑定在一起的框架。
 
@@ -9,7 +9,7 @@ AI Development Agency 不是新的 AI Coding Runtime，也不是把多个 Agent 
 
 ## 1. 核心理念
 
-把软件研发拆成五个核心维度：
+把软件研发拆成六个核心维度：
 
 | 层次      | 解决的问题     | 目录                  |
 | --------- | -------------- | --------------------- |
@@ -18,6 +18,7 @@ AI Development Agency 不是新的 AI Coding Runtime，也不是把多个 Agent 
 | Workflow  | 按什么顺序做   | `workflows/`          |
 | Context   | 在什么背景下做 | `context/`            |
 | Evolution | 怎么进化       | `evolution/` + `rules/evolution.md` |
+| Skill     | 轻量场景即调即走 | `skills/`            |
 
 核心关系：
 
@@ -92,6 +93,7 @@ AI-Development-Agency/
 ├── artifacts/                # 标准研发产物
 ├── validation/               # 验证与质量检查（scripts/validate.sh 门禁）
 ├── evolution/                # 规则自进化（feedback / proposals / archive / metrics）
+├── skills/                   # 场景技能层（debt / task-audit / diff-review 等轻量场景）
 ├── scripts/                  # 工具链：agency CLI + 初始化 / 校验 / 进化脚本
 ├── templates/                # 项目 AGENTS.md / 提案等模板
 ├── docs/                     # 日常使用手册等文档
@@ -366,6 +368,7 @@ agency feedback --kind rule_gap --detail "遇到的问题"
 9. 医疗业务必须区分正式规则、业务事实和模型推断。
 10. 敏感医疗数据遵守最小权限、脱敏和审计原则。
 11. 完成任务后必须说明修改内容、验证方式和风险。
+12. 有意的简化必须留痕：`agency: <上限>, <升级路径>` 注释（见 `rules/minimalism.md`）。
 
 ## 12. 三种工具怎么分工
 

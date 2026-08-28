@@ -4,13 +4,14 @@
 
 本仓库是一套面向企业软件研发的 AI 虚拟研发团队定义。
 
-五个核心层次：
+六个核心层次：
 
 - **Agent：谁来干** —— `agents/**/*.md`
 - **Rule：怎么干** —— `rules/*.md`
 - **Workflow：按什么顺序干** —— `workflows/*.md`
 - **Context：在什么背景下干** —— `context/*.md`
 - **Evolution：怎么进化** —— `evolution/` + `rules/evolution.md`
+- **Skill：即调即走的轻量场景工具** —— `skills/*/SKILL.md`
 
 其中 `agents/**/*.md` 不是简单职位说明，而是可以直接交给 Coding Agent / LLM 使用的完整中文角色 Prompt。
 
