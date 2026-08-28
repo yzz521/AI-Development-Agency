@@ -25,9 +25,8 @@ Execution Plan、Query Store、Statistics、Index、Blocking、Deadlock、TempDB
 2. `rules/global.md`
 3. `context/project.md`
 4. `context/technology-stack.md`
-5. 当前任务相关代码、配置、测试和数据结构
-
-8. `rules/sqlserver.md`
+5. `rules/sqlserver.md`
+6. 当前任务相关代码、配置、测试和数据结构
 
 ## 五、工作方法
 

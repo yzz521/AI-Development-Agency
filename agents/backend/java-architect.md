@@ -25,10 +25,10 @@ vibe: 尊重现有结构，先小步改进。
 2. `rules/global.md`
 3. `context/project.md`
 4. `context/technology-stack.md`
-5. 当前任务相关代码、配置、测试和数据结构
+5. `rules/java.md`
+6. 当前任务相关代码、配置、测试和数据结构
 
-8. `rules/java.md`
-9. 当前模块、接口、数据库
+> 输入材料（非文件项，按需获取）：当前模块、接口、数据库。
 
 ## 五、工作方法
 

@@ -25,9 +25,8 @@ T-SQL、条件安全、事务、索引、分页、批量、DDL、兼容性。
 2. `rules/global.md`
 3. `context/project.md`
 4. `context/technology-stack.md`
-5. 当前任务相关代码、配置、测试和数据结构
-
-8. `rules/sqlserver.md`
+5. `rules/sqlserver.md`
+6. 当前任务相关代码、配置、测试和数据结构
 
 ## 五、工作方法
 

@@ -1,7 +1,7 @@
 # AI Development Agency
 
 > 面向企业软件研发的 AI 虚拟研发团队规范库。  
-> 当前版本：**v1.2**
+> 当前版本：**v1.3**
 
 AI Development Agency 不是新的 AI Coding Runtime，也不是把多个 Agent 强行绑定在一起的框架。
 
@@ -9,14 +9,15 @@ AI Development Agency 不是新的 AI Coding Runtime，也不是把多个 Agent 
 
 ## 1. 核心理念
 
-把软件研发拆成四个核心维度：
+把软件研发拆成五个核心维度：
 
-| 层次     | 解决的问题     | 目录         |
-| -------- | -------------- | ------------ |
-| Agent    | 谁来做         | `agents/`    |
-| Rule     | 怎么做         | `rules/`     |
-| Workflow | 按什么顺序做   | `workflows/` |
-| Context  | 在什么背景下做 | `context/`   |
+| 层次      | 解决的问题     | 目录                  |
+| --------- | -------------- | --------------------- |
+| Agent     | 谁来做         | `agents/`             |
+| Rule      | 怎么做         | `rules/`              |
+| Workflow  | 按什么顺序做   | `workflows/`          |
+| Context   | 在什么背景下做 | `context/`            |
+| Evolution | 怎么进化       | `evolution/` + `rules/evolution.md` |
 
 核心关系：
 
@@ -89,7 +90,9 @@ AI-Development-Agency/
 ├── adapters/                 # Codex / Reasonix / DeepSeek Harness
 ├── contracts/                # Agent / Workflow 输出约定
 ├── artifacts/                # 标准研发产物
-└── validation/               # 验证与质量检查
+├── validation/               # 验证与质量检查
+├── evolution/                # 规则自进化（feedback / proposals / archive / metrics）
+└── CHANGELOG.md              # 规则版本变更记录
 ```
 
 ## 4. 当前覆盖的角色
@@ -147,6 +150,7 @@ AI-Development-Agency/
 - AI Tech Lead
 - Software Architect
 - Codebase Onboarding
+- Agency Curator（规范自进化评审）
 
 完整角色以 `agents/` 目录实际文件为准。
 
@@ -408,9 +412,11 @@ Codex / Reasonix / DeepSeek Harness
 第二阶段
 真实项目持续使用
       ↓
-发现问题
+发现问题 → agency feedback 记录反馈
       ↓
-补充 Rule / Workflow
+agency propose 创建提案
+      ↓
+agency-curator 评审合并（evolution-review workflow）
 
 第三阶段
 积累稳定研发模式
@@ -426,7 +432,20 @@ Codex / Reasonix / DeepSeek Harness
 
 这个闭环真正跑通。
 
-## 14. 最终目标
+## 14. 规则自进化（Evolution）
+
+使用不再是一次性的：每次任务完成后按硬规则记录反馈（`agency feedback`），缺口升级为提案（`agency propose`），agency-curator 按 `workflows/evolution-review.md` 评审合并，版本与变更记录在 `CHANGELOG.md`。闭环：
+
+```text
+使用 → 反馈 → 提案 → 评审 → 合并 → 版本化 → 再使用
+```
+
+- 治理规则：`rules/evolution.md`
+- 评审角色：`agents/leadership/agency-curator.md`
+- 评审流程：`workflows/evolution-review.md`
+- 日常命令：`agency`（`scripts/agency.sh`），详见 `docs/日常使用手册.md`
+
+## 15. 最终目标
 
 ```text
                  人
@@ -458,7 +477,7 @@ Codex / Reasonix / DeepSeek Harness
 
 **Agency 定义“应该怎样研发”，AI Coding 工具负责“真正去执行”。**
 
-## 15. 仓库
+## 16. 仓库
 
 GitHub：
 

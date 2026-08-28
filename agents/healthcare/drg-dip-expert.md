@@ -25,9 +25,8 @@ DRG、DIP、病案首页、诊断、手术操作、分组、结算、监管。
 2. `rules/global.md`
 3. `context/project.md`
 4. `context/technology-stack.md`
-5. 当前任务相关代码、配置、测试和数据结构
-
-8. `rules/healthcare.md`
+5. `rules/healthcare.md`
+6. 当前任务相关代码、配置、测试和数据结构
 
 ## 五、工作方法
 

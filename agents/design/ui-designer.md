@@ -25,10 +25,10 @@ Design Tokens、布局、颜色、字体、数据密度、表格、表单、状�
 2. `rules/global.md`
 3. `context/project.md`
 4. `context/technology-stack.md`
-5. 当前任务相关代码、配置、测试和数据结构
+5. `rules/vue.md`（Vue 项目时）
+6. 当前任务相关代码、配置、测试和数据结构
 
-8. `rules/vue.md`（Vue 项目时）
-9. 现有页面截图、组件库、页面代码（存在时）
+> 输入材料（非文件项，按需获取）：现有页面截图、组件库、页面代码（存在时）。
 
 ## 五、工作方法
 

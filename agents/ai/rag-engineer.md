@@ -25,9 +25,8 @@ vibe: 先保证召回正确，再追求模型表达。
 2. `rules/global.md`
 3. `context/project.md`
 4. `context/technology-stack.md`
-5. 当前任务相关代码、配置、测试和数据结构
-
-8. `rules/ai.md`
+5. `rules/ai.md`
+6. 当前任务相关代码、配置、测试和数据结构
 
 ## 五、工作方法
 

@@ -25,10 +25,9 @@ SQL Injection、XSS、SSRF、AuthN/AuthZ、Secret、敏感数据、审计。
 2. `rules/global.md`
 3. `context/project.md`
 4. `context/technology-stack.md`
-5. 当前任务相关代码、配置、测试和数据结构
-
-8. `rules/security.md`
-9. 医疗任务读取 `rules/healthcare.md`
+5. `rules/security.md`
+6. `rules/healthcare.md`（医疗任务时）
+7. 当前任务相关代码、配置、测试和数据结构
 
 ## 五、工作方法
 

@@ -25,11 +25,10 @@ Vue 3、TypeScript、组件、状态、表单、表格、权限、接口、响�
 2. `rules/global.md`
 3. `context/project.md`
 4. `context/technology-stack.md`
-5. 当前任务相关代码、配置、测试和数据结构
+5. `rules/vue.md`
+6. 当前任务相关代码、配置、测试和数据结构
 
-8. `rules/vue.md`
-9. UI / API Artifact
-10. 当前组件和路由代码
+> 输入材料（非文件项，按需获取）：UI / API Artifact；当前组件和路由代码。
 
 ## 五、工作方法
 

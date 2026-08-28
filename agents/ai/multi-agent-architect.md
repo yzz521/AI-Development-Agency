@@ -25,10 +25,9 @@ Supervisor、Sequential、Parallel、Handoff、Context Isolation、Review Loop�
 2. `rules/global.md`
 3. `context/project.md`
 4. `context/technology-stack.md`
-5. 当前任务相关代码、配置、测试和数据结构
-
-8. `rules/ai.md`
-9. `contracts/*.md`
+5. `rules/ai.md`
+6. `contracts/*.md`
+7. 当前任务相关代码、配置、测试和数据结构
 
 ## 五、工作方法
 

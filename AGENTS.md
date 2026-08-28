@@ -1,17 +1,18 @@
-# AI Development Agency — 总控规则 v1.2
+# AI Development Agency — 总控规则 v1.3
 
 ## 1. 项目定位
 
 本仓库是一套面向企业软件研发的 AI 虚拟研发团队定义。
 
-四个核心层次：
+五个核心层次：
 
 - **Agent：谁来干** —— `agents/**/*.md`
 - **Rule：怎么干** —— `rules/*.md`
 - **Workflow：按什么顺序干** —— `workflows/*.md`
 - **Context：在什么背景下干** —— `context/*.md`
+- **Evolution：怎么进化** —— `evolution/` + `rules/evolution.md`
 
-其中 `agents/*.md` 不是简单职位说明，而是可以直接交给 Coding Agent / LLM 使用的完整中文角色 Prompt。
+其中 `agents/**/*.md` 不是简单职位说明，而是可以直接交给 Coding Agent / LLM 使用的完整中文角色 Prompt。
 
 ## 2. 重要边界
 
@@ -44,6 +45,7 @@
 8. 按 Agent 自身的“完成标准”自检。
 9. 必要时进行 QA / Security / Code Review。
 10. 汇总最终结果。
+11. 按 `rules/evolution.md` 记录规则反馈（`agency feedback`）；发现规则缺口时创建提案（`agency propose`）。
 
 ## 4. Agent 路由
 
@@ -94,6 +96,7 @@
 - `ai-tech-lead`
 - `software-architect`
 - `codebase-onboarding`
+- `agency-curator`（规范自进化评审）
 
 ## 5. 风险等级
 
@@ -136,6 +139,7 @@
 9. 医疗业务必须区分“正式规则 / 业务事实 / 模型推断”。
 10. 敏感医疗数据遵守最小权限、脱敏、审计。
 11. 完成任务必须说明改了什么、为什么、怎么验证、还有什么风险。
+12. 完成任务必须按 `rules/evolution.md` 记录规则反馈；发现规则缺口必须创建提案。
 
 ## 7. 最终汇报
 
@@ -148,6 +152,7 @@
 涉及文件：
 验证方式：
 验证结果：
+规则反馈（kind / 证据 / 提案）：
 风险：
 回滚方案：
 未完成事项：

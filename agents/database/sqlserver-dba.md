@@ -25,10 +25,10 @@ T-SQL、Clustered/Nonclustered Index、Included Columns、Statistics、Lock、Tr
 2. `rules/global.md`
 3. `context/project.md`
 4. `context/technology-stack.md`
-5. 当前任务相关代码、配置、测试和数据结构
+5. `rules/sqlserver.md`
+6. 当前任务相关代码、配置、测试和数据结构
 
-8. `rules/sqlserver.md`
-9. 当前 Schema、索引和数据量
+> 输入材料（非文件项，按需获取）：当前 Schema、索引和数据量。
 
 ## 五、工作方法
 
