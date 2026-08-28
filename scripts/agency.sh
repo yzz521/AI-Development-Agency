@@ -9,6 +9,10 @@
 #   agency list [agents|rules|workflows|context]   列出分类内容
 #   agency use <agent> [--raw]     组装并打印某 Agent 的完整使用块
 #   agency search <关键词>         在规范库中搜索
+#   agency require [--title] [dir] 创建需求单（人提需求用，产物在项目 .ai/requirements/）
+#   agency task [--title] [dir]    创建任务单（AI 执行证据，产物在项目 .ai/tasks/）
+#   agency audit [dir]             交叉核对任务单，验证 AI 是否真实按规范执行
+#   agency debt [dir]              收割 agency: 注释为债务台账（简化留痕）
 #   agency feedback ...            记录规则使用反馈（自进化采集层）
 #   agency propose ...             创建规则/规范改进提案（自进化提案层）
 #   agency review                  生成本轮评审简报（自进化评审层）
@@ -30,7 +34,7 @@ SCRIPT_DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
 AGENCY_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 usage() {
-  sed -n '3,24p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '3,23p' "$0" | sed 's/^# \{0,1\}//'
 }
 
 version_of() {
@@ -127,6 +131,10 @@ cmd_search() {
 
 cmd_feedback() { "$SCRIPT_DIR/feedback.sh" "$@"; }
 cmd_propose()  { "$SCRIPT_DIR/propose.sh" "$@"; }
+cmd_require()  { "$SCRIPT_DIR/requirement.sh" "$@"; }
+cmd_task()     { "$SCRIPT_DIR/task.sh" "$@"; }
+cmd_audit()    { "$SCRIPT_DIR/audit.sh" "$@"; }
+cmd_debt()     { "$SCRIPT_DIR/debt.sh" "${1:-}"; }
 cmd_review()   { "$SCRIPT_DIR/review.sh" "$@"; }
 cmd_validate() { "$SCRIPT_DIR/validate.sh"; }
 
@@ -153,6 +161,10 @@ case "$cmd" in
   search|grep)           cmd_search "${1:-}";;
   feedback)              cmd_feedback "$@";;
   propose)               cmd_propose "$@";;
+  require)               cmd_require "$@";;
+  task)                  cmd_task "$@";;
+  audit)                 cmd_audit "${1:-}";;
+  debt)                  cmd_debt "${1:-}";;
   review)                cmd_review;;
   validate)              cmd_validate;;
   changelog)             cmd_changelog;;
