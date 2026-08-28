@@ -1,4 +1,4 @@
-# AI Development Agency — 总控规则 v1.3
+# AI Development Agency — 总控规则 v1.4.0
 
 ## 1. 项目定位
 
@@ -97,6 +97,12 @@
 - `software-architect`
 - `codebase-onboarding`
 - `agency-curator`（规范自进化评审）
+
+### 角色与技能纪律
+
+- **角色是身份**（`agents/**/*.md`），**技能是场景工具**（`skills/*/SKILL.md`）：调用一个技能不改变当前角色。
+- 技能必须自带三段式：**触发描述**（什么时候用）、**边界**（只做什么、不做什么）、**退出方式**（做完如何停止）。
+- 轻量场景优先用技能（即调即走、单一产出），不套用重角色 Prompt。
 
 ## 5. 风险等级
 

@@ -2,6 +2,16 @@
 
 所有规则/规范变更记录于此。版本语义见 `rules/evolution.md`（MAJOR=破坏性，MINOR=新增，PATCH=澄清/修正）。
 
+## v1.4.0（2026-08-28）
+
+**最小化决策阶梯与场景技能层（MINOR）**
+
+- 新增 `rules/minimalism.md`：7 级最小化决策阶梯 + "先理解再最小" + bug 修根因 + 绝不偷懒清单 + 非平凡逻辑留可运行检查 + 简化留痕（提案 `20260828-ponytail-minimalism`）。
+- `rules/global.md` 新增第 9 条：有意的简化必须 `agency: <上限>, <升级路径>` 注释标注。
+- 新增 `scripts/debt.sh` + `agency debt`：收割 `agency:` 注释为债务台账，无升级路径标记 `no-trigger`。
+- 新增 `skills/` 场景技能层：定义文档 + 3 个示例技能（debt / task-audit / diff-review）（提案 `20260828-skills`）。
+- 总控 `AGENTS.md` 补"角色与技能纪律"；升级 v1.4.0。
+
 ## v1.3.1（2026-08-28）
 
 **工具链增强（PATCH）**
