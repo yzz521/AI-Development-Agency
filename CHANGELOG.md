@@ -2,6 +2,15 @@
 
 所有规则/规范变更记录于此。版本语义见 `rules/evolution.md`（MAJOR=破坏性，MINOR=新增，PATCH=澄清/修正）。
 
+## v1.3.1（2026-08-28）
+
+**工具链增强（PATCH）**
+
+- 新增 `templates/requirement.md` + `agency require`：需求单，提需求标准化（5 要素）。
+- 新增 `templates/task-report.md` + `agency task`：任务单，记录 AI 实际读取/修改文件、验证命令、规则反馈。
+- 新增 `agency audit`：交叉核对任务单——引用存在性、git/修改时间痕迹、规则可解析、反馈合法性；让"是否真实按规范执行"可机器核查。
+- 手册新增"步骤 0 提需求"与"步骤 10 留证据/审计"。
+
 ## v1.3.0（2026-08-28）
 
 **自进化机制上线（Evolution Layer）**

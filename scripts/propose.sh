@@ -51,12 +51,14 @@ case " $TYPES " in *" $type "*) ;; *) echo "非法 type: $type（可用: $TYPES�
 [ -z "$author" ] && author="$(git -C "$AGENCY_ROOT" config user.name 2>/dev/null || echo "unknown")"
 
 DATE="$(date +%Y%m%d)"
-slug="$(printf '%s' "$title" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9一-龥' '-' | sed 's/-\+/-/g; s/^-//; s/-$//')"
-[ -n "$slug" ] || slug="untitled"
+# slug 只保留 ASCII 字母数字（tr 多字节在 C locale 下不可靠），冲突时追加序号
+slug="$(printf '%s' "$title" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9' '-' | sed -E 's/-+/-/g; s/^-+//; s/-+$//')"
+[ -n "$slug" ] || slug="proposal"
 PROP_DIR="$AGENCY_ROOT/evolution/proposals"
 mkdir -p "$PROP_DIR"
 FILE="$PROP_DIR/$DATE-$slug.md"
-[ -e "$FILE" ] && { echo "错误：提案已存在: $FILE" >&2; exit 1; }
+n=2
+while [ -e "$FILE" ]; do FILE="$PROP_DIR/$DATE-$slug-$n.md"; n=$((n+1)); done
 
 {
   echo "---"
