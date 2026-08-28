@@ -38,7 +38,7 @@ AI Development Agency 不是新的 AI Coding Runtime，也不是把多个 Agent 
  ↓
 测试 / Review
  ↓
-汇报结果
+汇报结果（含规则反馈）
 ```
 
 所以本仓库不是简单的 Prompt 集合，而是一套可复用的 AI 研发角色与研发流程规范。
@@ -90,12 +90,34 @@ AI-Development-Agency/
 ├── adapters/                 # Codex / Reasonix / DeepSeek Harness
 ├── contracts/                # Agent / Workflow 输出约定
 ├── artifacts/                # 标准研发产物
-├── validation/               # 验证与质量检查
+├── validation/               # 验证与质量检查（scripts/validate.sh 门禁）
 ├── evolution/                # 规则自进化（feedback / proposals / archive / metrics）
-└── CHANGELOG.md              # 规则版本变更记录
+├── scripts/                  # 工具链：agency CLI + 初始化 / 校验 / 进化脚本
+├── templates/                # 项目 AGENTS.md / 提案等模板
+├── docs/                     # 日常使用手册等文档
+├── CHANGELOG.md              # 规则版本变更记录
+└── .github/                  # CI（validate.yml 规范守门）
 ```
 
-## 4. 当前覆盖的角色
+## 4. 快速开始（30 秒）
+
+```bash
+# 1) 安装 agency 命令到 PATH（~/.local/bin 或 ~/bin）
+./scripts/install-cli.sh
+
+# 2) 把本规范接入你的项目（.ai/agency 软链接 + 项目 AGENTS.md，已有不覆盖）
+agency init ~/workspace/你的项目
+
+# 3) 开工：组装一个 Agent 的使用块（角色 + 必读规则 + 建议流程）
+agency use java-developer
+
+# 4) 收工：记录规则使用反馈（自进化的起点）
+agency feedback --kind rule_gap --detail "遇到的问题"
+```
+
+> 完整日常用法见 `docs/日常使用手册.md`；校验规范库用 `agency validate`。
+
+## 5. 当前覆盖的角色
 
 ### 产品
 
@@ -154,7 +176,7 @@ AI-Development-Agency/
 
 完整角色以 `agents/` 目录实际文件为准。
 
-## 5. 当前支持的 AI Coding 工具
+## 6. 当前支持的 AI Coding 工具
 
 通过 `adapters/` 提供接入说明，目前包括：
 
@@ -180,7 +202,7 @@ AI-Development-Agency/
 
 不要为了适配某一个工具，把完整 Agent Prompt 复制到工具自己的配置目录中。
 
-## 6. 如何接入真实项目
+## 7. 如何接入真实项目
 
 推荐采用：
 
@@ -221,7 +243,7 @@ AI-Development-Agency/
 
 这样移动整个 workspace、换目录或者换电脑时，不需要重新修改大量路径。
 
-## 7. 项目级 AGENTS.md 的职责
+## 8. 项目级 AGENTS.md 的职责
 
 中央 Agency 负责通用规范，项目自己的 `AGENTS.md` 负责项目特有信息：
 
@@ -250,7 +272,7 @@ AI-Development-Agency/
 真实项目代码
 ```
 
-## 8. 一个典型任务
+## 9. 一个典型任务
 
 例如：
 
@@ -282,6 +304,8 @@ AI-Development-Agency/
 11. Code Review / QA
         ↓
 12. 汇报修改、验证和风险
+        ↓
+13. 记录规则反馈 / 创建提案（自进化）
 ```
 
 对于简单任务，不需要强行加载所有 Agent。
@@ -290,7 +314,7 @@ AI-Development-Agency/
 
 > **选择最小必要 Agent，而不是 Agent 越多越好。**
 
-## 9. 风险等级
+## 10. 风险等级
 
 ### L1 — 低风险
 
@@ -329,7 +353,7 @@ AI-Development-Agency/
 - Rollback 方案
 - 验证证据
 
-## 10. 全局研发原则
+## 11. 全局研发原则
 
 1. **先读代码，再修改。**
 2. 不凭空假设现有结构。
@@ -343,7 +367,7 @@ AI-Development-Agency/
 10. 敏感医疗数据遵守最小权限、脱敏和审计原则。
 11. 完成任务后必须说明修改内容、验证方式和风险。
 
-## 11. 三种工具怎么分工
+## 12. 三种工具怎么分工
 
 ### Codex
 
@@ -384,7 +408,7 @@ AI-Development-Agency/
 adapters/deepseek-harness.md
 ```
 
-## 12. 当前阶段暂时不做什么
+## 13. 当前阶段暂时不做什么
 
 为了避免过早复杂化，当前阶段暂时不做：
 
@@ -399,7 +423,7 @@ adapters/deepseek-harness.md
 
 > **先让 Agent / Rule / Workflow 真正进入日常研发，并验证它是否能够稳定提升开发质量。**
 
-## 13. 推荐使用顺序
+## 14. 推荐使用顺序
 
 ```text
 第一阶段
@@ -432,7 +456,7 @@ agency-curator 评审合并（evolution-review workflow）
 
 这个闭环真正跑通。
 
-## 14. 规则自进化（Evolution）
+## 15. 规则自进化（Evolution）
 
 使用不再是一次性的：每次任务完成后按硬规则记录反馈（`agency feedback`），缺口升级为提案（`agency propose`），agency-curator 按 `workflows/evolution-review.md` 评审合并，版本与变更记录在 `CHANGELOG.md`。闭环：
 
@@ -445,7 +469,7 @@ agency-curator 评审合并（evolution-review workflow）
 - 评审流程：`workflows/evolution-review.md`
 - 日常命令：`agency`（`scripts/agency.sh`），详见 `docs/日常使用手册.md`
 
-## 15. 最终目标
+## 16. 最终目标
 
 ```text
                  人
@@ -477,7 +501,7 @@ agency-curator 评审合并（evolution-review workflow）
 
 **Agency 定义“应该怎样研发”，AI Coding 工具负责“真正去执行”。**
 
-## 16. 仓库
+## 17. 仓库
 
 GitHub：
 
