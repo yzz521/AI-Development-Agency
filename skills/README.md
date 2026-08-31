@@ -11,11 +11,31 @@
 
 ## 结构
 
-每个技能一个目录，含 `SKILL.md`，必须写三段式：
+每个技能一个目录，含 `SKILL.md`。
+
+### 1. frontmatter（必须，否则任何工具都发现不了）
+
+```markdown
+---
+name: debt
+description: 一句话说明「做什么 + 什么时候用」，把触发词嵌进去。
+---
+```
+
+- `name` **必须**小写字母/数字/连字符，且与父目录名一致。
+- `description` 是工具做**自动匹配**的唯一依据：必须同时写清「干什么」和「何时用」，把用户可能说的触发词写进去。
+- 缺 frontmatter 的 `SKILL.md` 只是一篇文档，Cursor / Claude Code / Codex 都不会自动加载。
+
+### 2. 正文三段式（必须）
 
 1. **触发描述**：什么时候调用（显式场景词）。
 2. **边界**：只做什么、不做什么（防越界，如审计时顺手改代码）。
 3. **退出方式**：做完如何停止、产出什么。
+
+### 3. 跨工具落点
+
+`SKILL.md` 是目前可移植性最好的载体，Cursor / Claude Code / Codex 均可加载。
+分发到项目时优先用厂商中立目录 `.agents/skills/`，避免为每个工具复制一份。
 
 ## 示例技能
 
@@ -24,8 +44,17 @@
 | `skills/debt/SKILL.md` | 收割债务 / 清单简化的债 | 跑 `agency debt` 输出台账 |
 | `skills/task-audit/SKILL.md` | 查 AI 是否真实执行 / 审计任务单 | 跑 `agency audit` + 解读 |
 | `skills/diff-review/SKILL.md` | review 改动 / 查过度设计 | 只审 diff 的过度设计 |
+| `skills/agency-task/SKILL.md` | 留证据 / 生成任务单 | 跑 `agency task` + 如实填写 |
+| `skills/agency-feedback/SKILL.md` | 记规则反馈 / 提规则改进 | 跑 `agency feedback` / `propose` |
 
 ## 新增技能
 
 - 遵循"一个提案一件事"：新增技能走 `agency propose`（type `other`）。
-- 技能必须自包含触发 / 边界 / 退出，否则不合并。
+- 技能必须自包含 frontmatter + 触发 / 边界 / 退出，否则不合并。
+- 技能只包装**已存在**的命令；命令还没实现就先别建技能（避免技能指向不存在的脚本）。
+
+## 不该做成技能的东西
+
+- **常驻红线规范**：技能是按需触发，漏一次即失效；红线该进 `AGENTS.md` 常驻注入。
+- **角色身份**：角色是全时段 Prompt（`agents/**/*.md`），调用技能不改变当前角色。
+- **强制门禁**：技能不具备强制力，真正的拦截靠 git hooks + CI。
