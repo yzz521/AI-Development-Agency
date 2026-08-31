@@ -93,10 +93,10 @@ AI-Development-Agency/
 ├── artifacts/                # 标准研发产物
 ├── validation/               # 验证与质量检查（scripts/validate.sh 门禁）
 ├── evolution/                # 规则自进化（feedback / proposals / archive / metrics）
-├── skills/                   # 场景技能层（debt / task-audit / diff-review 等轻量场景）
+├── skills/                   # 场景技能层（debt / diff-review / task-audit / agency-task / agency-feedback）
 ├── scripts/                  # 工具链：agency CLI + 初始化 / 校验 / 进化脚本
 ├── templates/                # 项目 AGENTS.md / 提案等模板
-├── docs/                     # 日常使用手册等文档
+├── docs/                     # 使用手册、批量初始化、团队推广方案、载体归属迁移清单
 ├── CHANGELOG.md              # 规则版本变更记录
 └── .github/                  # CI（validate.yml 规范守门）
 ```
@@ -471,6 +471,26 @@ agency-curator 评审合并（evolution-review workflow）
 - 评审角色：`agents/leadership/agency-curator.md`
 - 评审流程：`workflows/evolution-review.md`
 - 日常命令：`agency`（`scripts/agency.sh`），详见 `docs/日常使用手册.md`
+
+## 15.1 让技能在各智能体里真正生效
+
+`skills/` 下的技能**放在本仓库里不会被任何工具自动发现** —— 各工具只扫自己的技能目录。
+把技能软链到用户级中立目录，即可在 Cursor / Claude Code / Codex 中对所有项目生效：
+
+```bash
+mkdir -p ~/.agents/skills
+for s in debt diff-review task-audit agency-task agency-feedback; do
+  ln -sfn ~/workspace/AI-Development-Agency/skills/$s ~/.agents/skills/$s
+done
+```
+
+- 软链而非复制：规范库更新后技能自动跟随，避免出现多份漂移。
+- 生效需**新开一个会话**（工具在会话启动时扫描技能目录）。
+- 技能必须带 frontmatter（`name` + `description`）才会被发现，详见 `skills/README.md`。
+
+> 常驻红线规范不要做成技能（技能是按需触发，漏一次即失效），应进项目根目录
+> `AGENTS.md`；真正的强制靠 git hooks + CI。载体如何归属见
+> `docs/载体归属迁移清单.md`，团队推广路径见 `docs/团队推广方案.md`。
 
 ## 16. 最终目标
 
