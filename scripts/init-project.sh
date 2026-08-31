@@ -6,7 +6,23 @@ PROJECT_DIR="${1:-}"
 if [ -z "$PROJECT_DIR" ]; then echo "用法: $0 <项目目录>"; exit 1; fi
 PROJECT_DIR="$(cd "$PROJECT_DIR" 2>/dev/null && pwd)" || { echo "错误：项目目录不存在：$1"; exit 1; }
 [ "$PROJECT_DIR" = "$AGENCY_ROOT" ] && { echo "错误：不能初始化 AI-Development-Agency 自己"; exit 1; }
-AI_DIR="$PROJECT_DIR/.ai"; LINK_PATH="$AI_DIR/agency"; REL="../$(basename "$AGENCY_ROOT")"; TEMPLATE="$AGENCY_ROOT/templates/project-AGENTS.md"
+
+# 软链接建在 .ai/ 里，相对路径必须从 .ai/ 起算；项目可位于 workspace 任意深度（init-all.sh RECURSIVE=1）
+# 纯参数展开实现，不依赖 here-string / 临时文件，兼容 bash 3.2
+relpath() {
+  local from="$1" to="$2" up=""
+  while [ "$from" != "/" ]; do
+    case "$to" in
+      "$from"/*) printf '%s' "${up}${to#"$from"/}"; return 0;;
+      "$from")   printf '%s' "${up%/}"; return 0;;
+    esac
+    from="${from%/*}"; [ -n "$from" ] || from="/"
+    up="../$up"
+  done
+  printf '%s' "${up}${to#/}"
+}
+
+AI_DIR="$PROJECT_DIR/.ai"; LINK_PATH="$AI_DIR/agency"; REL="$(relpath "$AI_DIR" "$AGENCY_ROOT")"; TEMPLATE="$AGENCY_ROOT/templates/project-AGENTS.md"
 mkdir -p "$AI_DIR"
 echo "==> 初始化项目：$PROJECT_DIR"
 if [ -L "$LINK_PATH" ]; then

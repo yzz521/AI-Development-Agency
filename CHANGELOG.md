@@ -2,6 +2,15 @@
 
 所有规则/规范变更记录于此。版本语义见 `rules/evolution.md`（MAJOR=破坏性，MINOR=新增，PATCH=澄清/修正）。
 
+## v1.4.1（2026-08-31）
+
+**修复项目接入软链接指向错误（PATCH）**
+
+- 修复 `scripts/init-project.sh`：软链接建在项目 `.ai/` 目录内，相对路径需从 `.ai/` 起算，原 `REL="../$(basename ...)"` 少一层，导致所有已接入项目的 `.ai/agency` 都是死链（`doctor` 报 `FAIL=5`，但 `agency list` / `agency use` 走 CLI 自身 `AGENCY_ROOT` 仍正常，问题被长期掩盖）。
+- 路径改为按项目实际深度计算，`RECURSIVE=1` 下嵌套项目同样正确；纯参数展开实现，不依赖 here-string 临时文件，兼容 bash 3.2。
+- 同步修正 `README.md`、`docs/批量初始化说明.md`、`docs/日常使用手册.md` 中 6 处错误路径示例。
+- 升级方式：`./scripts/init-all.sh ~/workspace` 重跑一次即可自愈全部项目（脚本已有链接比对与重建逻辑）。
+
 ## v1.4.0（2026-08-28）
 
 **最小化决策阶梯与场景技能层（MINOR）**
