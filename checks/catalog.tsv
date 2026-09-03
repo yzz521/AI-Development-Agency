@@ -1,0 +1,13 @@
+# Agency 机检目录。列：id|default|severity|globs|engine|rule|message
+# default=on 才会在未改 conf 时启用。Javert 专有规则不要进本表。
+# engine 必须在 scripts/check.sh 的 run_engine 里实现。
+# 误报高或中央未收的规则默认 off，项目可在 agency-check.conf 打开。
+java-map-object|on|error|*.java,*.kt|java-map-object|rules/java.md|跨层禁止 Map<String, Object>（Kotlin: Map<String, Any>）作业务对象，用 DTO/Command/Query/VO
+sql-select-star|on|error|*.sql,*Mapper.xml,*mapper.xml,*.xml|sql-select-star|rules/sqlserver.md|禁止 SELECT *
+secret-hardcoded|on|error|*.yml,*.yaml,*.properties,.env,.env.*,*.env|secret-hardcoded|rules/global.md|密钥/密码不得写死在源码，走环境变量或密钥管理
+java-pathvariable|off|error|*.java|java-pathvariable|rules/java.md|禁止用 @PathVariable 传业务参数（资源 id 也会命中，故默认关）
+sql-limit|off|error|*.sql,*Mapper.xml,*mapper.xml,*.xml|sql-limit|rules/sqlserver.md|SQL LIMIT（中央未收，仅 MySQL/PG 项目按需打开）
+sql-backtick|off|error|*.sql,*Mapper.xml,*mapper.xml,*.xml|sql-backtick|rules/sqlserver.md|SQL 标识符反引号（中央未收，按需打开）
+java-fqcn|off|warning|*.java|java-fqcn|rules/java.md|禁止行内全限定类名（必须排除 import；误报过 18 倍，默认关）
+java-requestbody-valid|off|warning|*.java|java-requestbody-valid|rules/java.md|@RequestBody 应同时有 @Valid/@Validated（分行注解会漏检，默认关）
+java-sensitive-log|off|warning|*.java,*.kt|java-sensitive-log|rules/healthcare.md|日志疑似带患者身份/证件号等敏感字段（字段清单未定，默认关）

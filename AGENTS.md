@@ -1,4 +1,4 @@
-# AI Development Agency — 总控规则 v1.4.1
+# AI Development Agency — 总控规则 v1.6.0
 
 ## 1. 项目定位
 
@@ -36,11 +36,11 @@
 
 收到任务：
 
-1. 读取 `context/project.md`、`context/technology-stack.md`。
+1. 读取当前项目 `AGENTS.md`（简介、技术栈、特殊规则、命令）。中央 `context/` 不分发到业务仓库。
 2. 判断任务类型和风险等级。
 3. 选择最小必要 Workflow。
 4. 选择主 Agent 和 Review Agent。
-5. 加载 `rules/global.md` 与对应技术 / 业务 Rule。
+5. 按规范路由加载**命中规则的摘要**（见下方「规范路由」段）。用户不必先跑 `agency` 命令。
 6. 阅读真实代码、配置、测试和数据库结构。
 7. 执行任务。
 8. 按 Agent 自身的“完成标准”自检。
@@ -104,6 +104,156 @@
 - **角色是身份**（`agents/**/*.md`），**技能是场景工具**（`skills/*/SKILL.md`）：调用一个技能不改变当前角色。
 - 技能必须自带三段式：**触发描述**（什么时候用）、**边界**（只做什么、不做什么）、**退出方式**（做完如何停止）。
 - 轻量场景优先用技能（即调即走、单一产出），不套用重角色 Prompt。
+- 写代码任务优先走 `skills/agency-route`：按任务/文件匹配规则摘要，不把 CLI 当入口。
+
+<!-- agency-router:begin -->
+## 规范路由（提示词自动生效，不必先跑命令）
+
+收到写代码 / 改接口 / 改页面 / 改 SQL / 修 bug 的任务时，**先按本段路由，再动手**。
+不要等用户输入 `agency route` 或 `agency use`。
+
+检测技术栈：java,vue,react,python,sqlserver,ai,healthcare,any
+
+### 怎么匹配
+
+1. 对照下面的信号表：任务关键词或将要改的文件。
+2. **只加载命中行的规则摘要**（本段已内嵌裁剪后的摘要）。
+3. 摘要不够再打开原文；不要把未命中的语言规范整篇塞进上下文。
+4. 每次都生效：`rules/global.md` + `rules/minimalism.md` + `rules/security.md`。
+5. 写代码回复的第一行必须是路由回执（给人核对有没有触发）：
+   `agency-route: matched=<id,id> risk=L2 rules=rules/java.md source=agents.md`
+
+### 信号表
+
+| 信号 | 加载规则 | Agent | 风险 |
+| --- | --- | --- | --- |
+| `*.java,*.kt` | `rules/java.md` | `java-developer` | L2 |
+| `application*.yml,application*.yaml,application*.properties,*ConfigurationProperties.java` | `rules/backend/java/spring-boot-configuration.md` | `java-developer` | L2 |
+| `*.vue` | `rules/vue.md` | `vue-developer` | L2 |
+| `*.tsx,*.jsx` | `rules/react.md` | `react-developer` | L2 |
+| `*.py` | `rules/python.md` | `python-developer` | L2 |
+| `*.sql,*Mapper.xml,*mapper.xml` | `rules/sqlserver.md` | `sqlserver-dba` | L2 |
+| `spring boot,springboot,mybatis,controller,dto` | `rules/java.md` | `java-developer` | L2 |
+| `vue,pinia,element plus,script setup` | `rules/vue.md` | `vue-developer` | L2 |
+| `react,hooks,tsx` | `rules/react.md` | `react-developer` | L2 |
+| `python,fastapi,django,pytest` | `rules/python.md` | `python-developer` | L2 |
+| `sql server,sqlserver,t-sql,tsql,存储过程,执行计划,query store` | `rules/sqlserver.md` | `sqlserver-dba` | L3 |
+| `RAG,OCR,embedding,LLM,prompt,向量检索,重排序` | `rules/ai.md` | `ai-engineer,rag-engineer` | L2 |
+| `医保,DRG,DIP,病组,病案,审核规则,医疗数据,患者,诊疗` | `rules/healthcare.md` | `medical-insurance-reviewer,healthcare-domain-expert` | L3 |
+| `性能,慢查询,吞吐,执行计划,profiler,优化延迟` | `rules/performance.md` | `sqlserver-performance` | - |
+| `安全审查,漏洞,cve,blocker` | `rules/security.md` | `security-reviewer` | - |
+| `bug,修复,报错,回归,npe,exception` | — | — | L1 |
+
+### 本项目应注入的摘要
+
+
+### rules/global.md
+- 先理解现有系统，再修改；不凭空假设已有结构。
+- 保持最小变更面；不删除或覆盖未知用途的代码、配置、数据。
+- 密钥、密码不进源码；公共逻辑优先复用，但避免过度抽象。
+- 关键逻辑必须有可验证的测试路径；数据、日志、错误信息最小必要。
+- 有意的简化必须 `agency: <上限>, <升级路径>` 留痕。
+
+原文路径：`rules/global.md`（项目内通常是 `.ai/agency/rules/global.md`）
+
+### rules/minimalism.md
+- 写代码前爬 7 级阶梯：YAGNI → 复用代码库 → 标准库 → 平台原生 → 已装依赖 → 一行 → 最小可行。
+- 先读任务和调用链，再爬阶梯；改错位置的小 diff 不是懒，是第二个 bug。
+- Bug 修根因：grep 所有调用方，修在共享路径上。
+- 不建没被要求的抽象，不为「以后」搭脚手架。
+- 绝不简化：信任边界校验、防数据丢失、安全、无障碍、用户明确要求的东西。
+- 非平凡逻辑留一个可运行检查。简化留痕见全局红线 `agency:` 注释。
+
+原文路径：`rules/minimalism.md`（项目内通常是 `.ai/agency/rules/minimalism.md`）
+
+### rules/security.md
+- 默认最小权限；密钥不进日志（不进源码见 `rules/global.md`）。
+- 所有外部输入视为不可信；SQL 必须参数化。
+- API 必须认证、授权和输入校验。
+
+原文路径：`rules/security.md`（项目内通常是 `.ai/agency/rules/security.md`）
+
+### rules/java.md
+- 语言与框架版本以项目 `AGENTS.md` 和构建文件为准，不在中央库写死。
+- Controller 接收完整 DTO，禁止用 `@PathVariable` 传业务参数；不把 DTO 拆成一串参数往下传。
+- 跨层禁止 `Map`；用 DTO / Command / Query / VO。
+- 禁止魔法值（项目常量类或 Enum）；错误码集中管理；输入必须校验。
+- 异常处理统一，Controller 不堆业务；事务边界由业务一致性决定。
+- 分页与权限走项目既有模式，不另起一套。
+
+原文路径：`rules/java.md`（项目内通常是 `.ai/agency/rules/java.md`）
+
+### rules/backend/java/spring-boot-configuration.md
+- YAML 用 kebab-case，Java 字段 camelCase；优先 `@ConfigurationProperties`，禁止业务代码大量 `@Value`。
+- 时间用 `Duration`（`5s` / `60s`），禁止魔法毫秒数。
+- Mock 与高风险功能默认关闭，生产不得靠默认值进入 Mock。
+- 配置按业务域拆分，禁止巨型 `CustomProperties`；改配置先搜引用和环境，最小修改。
+- 敏感项走环境变量（常驻红线）；示例根前缀用 `app`，项目里换成自己的前缀。
+
+原文路径：`rules/backend/java/spring-boot-configuration.md`（项目内通常是 `.ai/agency/rules/backend/java/spring-boot-configuration.md`）
+
+### rules/vue.md
+- 跟随项目已有 Vue 写法（现有 Composition API + `<script setup>` 则保持）；版本以项目为准。
+- 页面、业务组件、基础组件职责分离。
+- API 用明确 TypeScript 类型，不用 `any` / 无约束对象传业务数据。
+- 异步必须覆盖 loading / empty / error / retry；表格筛选分页优先复用项目已有模式。
+- 不为视觉效果改业务逻辑和页面布局，除非需求明确要求。
+- 状态管理、UI 库以项目既有方案为准，不擅自引入新框架。
+
+原文路径：`rules/vue.md`（项目内通常是 `.ai/agency/rules/vue.md`）
+
+### rules/react.md
+- TypeScript 优先；组件职责单一。
+- API 参数和响应使用明确类型；优先复用项目既有状态管理和组件库。
+- Hooks 只放状态 / 生命周期 / 可复用逻辑；保持可测试与可访问。
+
+原文路径：`rules/react.md`（项目内通常是 `.ai/agency/rules/react.md`）
+
+### rules/python.md
+- 优先明确类型和函数职责；AI / OCR / RAG 与 Web API、数据处理解耦。
+- 外部调用必须有超时、重试、错误分类和日志。
+- 长任务考虑幂等、断点、重试和资源释放。
+
+原文路径：`rules/python.md`（项目内通常是 `.ai/agency/rules/python.md`）
+
+### rules/sqlserver.md
+- 禁止 `SELECT *`（SQL 参数化见常驻安全红线，改 SQL 时再强调一次）。
+- 索引和字段变更要结合真实访问模式，评估锁与执行时间。
+- 慢 SQL 先看 Query Store / Actual Execution Plan，关注参数嗅探、隐式转换、扫描。
+- 结构变更必须说明影响对象、数据量、窗口、锁、回滚、前后兼容。
+
+原文路径：`rules/sqlserver.md`（项目内通常是 `.ai/agency/rules/sqlserver.md`）
+
+### rules/ai.md
+- 模型输出不是事实，尤其是政策、外部知识和未引用的数字。
+- Prompt 写清角色、上下文、输入、约束、输出格式和失败处理。
+- Agent 任务尽量单一、可验证；Structured Output 优先。
+- 生产链路要有超时、重试、fallback、成本与日志；RAG 评估召回、引用、chunk 与重排序。
+- 若进入医疗/医保链路，加读 `rules/healthcare.md`，不得静默覆盖确定性业务规则。
+
+原文路径：`rules/ai.md`（项目内通常是 `.ai/agency/rules/ai.md`）
+
+### rules/healthcare.md
+- 业务规则来源必须可追溯；命中 / 未命中 / 无法判断必须区分。
+- AI 建议与系统最终审核结论必须区分；医疗 AI 不得静默覆盖确定性规则。
+- 生产数据按敏感数据处理；访问必须可审计；日志避免患者身份、完整病历等敏感字段。
+- AI 输出进入医疗链路必须结构化校验且人工可追溯。
+- 复杂医疗后台优先保证信息层级、数据密度、扫描效率和可操作性。
+
+原文路径：`rules/healthcare.md`（项目内通常是 `.ai/agency/rules/healthcare.md`）
+
+### rules/performance.md
+- 任何性能优化都尽量用指标、执行计划或可复现实验验证，禁止只凭感觉改。
+
+原文路径：`rules/performance.md`（项目内通常是 `.ai/agency/rules/performance.md`）
+
+### 仍不要做的事
+
+- 不要为了「走完流程」加载全部 Agent Prompt。
+- 不要把 `.ai/agency/` 整库读进上下文。
+- 红线靠本摘要降低违规概率；真正强制是 `agency check`（git hook / CI），只卡增量、不卡存量。
+- 不要省略路由回执；没有 `agency-route:` 第一行，人无法核对本次是否触发。
+<!-- agency-router:end -->
 
 ## 5. 风险等级
 
@@ -135,18 +285,18 @@
 
 ## 6. 全局硬规则
 
-1. 先读代码，再修改。
-2. 不凭空假设已有结构。
-3. 默认最小改动。
-4. 禁止无关重构。
-5. 不擅自替换技术栈。
-6. 禁止用 Map 代替明确业务对象。
-7. 禁止魔法值。
-8. 数据库变更必须考虑索引、锁、事务、回滚与兼容。
-9. 医疗业务必须区分“正式规则 / 业务事实 / 模型推断”。
-10. 敏感医疗数据遵守最小权限、脱敏、审计。
-11. 完成任务必须说明改了什么、为什么、怎么验证、还有什么风险。
-12. 完成任务必须按 `rules/evolution.md` 记录规则反馈；发现规则缺口必须创建提案。
+常驻红线（每次写代码都生效）。语言/领域细则走规范路由，不在此重复。
+
+1. 先理解现有系统再修改；不凭空假设已有结构。
+2. 保持最小变更面；禁止无关重构；不擅自替换技术栈。
+3. 不删除或覆盖未知用途的代码、配置、数据。
+4. 密钥不进源码、不进日志；外部输入不可信；SQL 必须参数化；API 必须认证、授权和输入校验。
+5. 关键逻辑必须有可验证路径；数据与日志最小必要。
+6. 有意简化必须 `agency: <上限>, <升级路径>` 留痕。
+7. 完成后说明改了什么、为什么、怎么验证、还有什么风险。规范要求的汇报完整写出。
+8. 规范库自身的任务必须按 `rules/evolution.md` 记录反馈；发现缺口必须提案。业务仓库建议记录，不强制每次。
+
+Map / 魔法值 / 业务 PathVariable 等见 Java 条件加载摘要。数据库迁移见 SQL 摘要。医疗口径见医疗摘要。
 
 ## 7. 最终汇报
 

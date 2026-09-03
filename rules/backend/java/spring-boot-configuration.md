@@ -2,6 +2,14 @@
 
 > 适用于 Java / Spring Boot 项目的 `application.yml`、`application.yaml`、`application-*.yml`、`application-*.yaml` 以及 `@ConfigurationProperties` 配置类。
 
+## 摘要（注入用）
+
+- YAML 用 kebab-case，Java 字段 camelCase；优先 `@ConfigurationProperties`，禁止业务代码大量 `@Value`。
+- 时间用 `Duration`（`5s` / `60s`），禁止魔法毫秒数。
+- Mock 与高风险功能默认关闭，生产不得靠默认值进入 Mock。
+- 配置按业务域拆分，禁止巨型 `CustomProperties`；改配置先搜引用和环境，最小修改。
+- 敏感项走环境变量（常驻红线）；示例根前缀用 `app`，项目里换成自己的前缀。
+
 ---
 
 ## 1. 规范目标
@@ -99,7 +107,7 @@ basic-compliance-api:
 推荐：
 
 ```yaml
-javert:
+app:
   ocr:
     recognition:
       base-url:
@@ -114,7 +122,7 @@ javert:
 不推荐：
 
 ```yaml
-javert:
+app:
   ocr-recognition-base-url:
   ocr-recognition-endpoint:
   ocr-recognition-model:
@@ -129,7 +137,7 @@ javert:
 禁止长期维护：
 
 ```java
-@ConfigurationProperties(prefix = "javert")
+@ConfigurationProperties(prefix = "app")
 public class CustomProperties {
     private String xxx;
     private String xxx2;
@@ -160,7 +168,7 @@ properties/
 优先：
 
 ```java
-@ConfigurationProperties(prefix = "javert.ocr")
+@ConfigurationProperties(prefix = "app.ocr")
 @Getter
 @Setter
 public class OcrProperties {
@@ -170,7 +178,7 @@ public class OcrProperties {
 或者：
 
 ```java
-@ConfigurationProperties(prefix = "javert.audit")
+@ConfigurationProperties(prefix = "app.audit")
 @Getter
 @Setter
 public class AuditProperties {
@@ -180,17 +188,17 @@ public class AuditProperties {
 不推荐在业务代码中大量使用：
 
 ```java
-@Value("${javert.ocr.base-url}")
+@Value("${app.ocr.base-url}")
 private String baseUrl;
 ```
 
 尤其禁止大量重复：
 
 ```java
-@Value("${javert.xxx.xxx}")
+@Value("${app.xxx.xxx}")
 private String xxx;
 
-@Value("${javert.xxx.xxx}")
+@Value("${app.xxx.xxx}")
 private String xxx2;
 ```
 
@@ -203,7 +211,7 @@ private String xxx2;
 推荐：
 
 ```java
-@ConfigurationProperties(prefix = "javert.audit")
+@ConfigurationProperties(prefix = "app.audit")
 public class AuditProperties {
 
     private String submitUrl;
@@ -215,7 +223,7 @@ public class AuditProperties {
 不推荐把 OCR、短信、微信、药房、审核等几十个领域全部塞进：
 
 ```java
-@ConfigurationProperties(prefix = "javert")
+@ConfigurationProperties(prefix = "app")
 public class CustomProperties {
 }
 ```
@@ -287,7 +295,7 @@ public class ApiConfig {
 推荐：
 
 ```yaml
-javert:
+app:
   external:
     example-service:
       base-url: ${EXAMPLE_SERVICE_BASE_URL:http://127.0.0.1:8080}
@@ -299,7 +307,7 @@ javert:
 具有特殊业务配置时可以继续扩展：
 
 ```yaml
-javert:
+app:
   external:
     desensitization:
       base-url:
@@ -562,7 +570,7 @@ ocr-pipeline:
 例如：
 
 ```java
-@ConfigurationProperties(prefix = "javert.ocr")
+@ConfigurationProperties(prefix = "app.ocr")
 @Validated
 @Getter
 @Setter
@@ -699,7 +707,7 @@ ocr:
 不推荐：
 
 ```yaml
-javert:
+app:
   ocr-pipeline-enabled:
   ocr-pipeline-timeout:
   ocr-model:
@@ -709,7 +717,7 @@ javert:
 推荐：
 
 ```yaml
-javert:
+app:
   ocr:
     pipeline:
       enabled:
@@ -889,7 +897,7 @@ AI 不应该顺便：
 推荐：
 
 ```yaml
-javert:
+app:
   external:
     example-service:
       base-url: ${EXAMPLE_SERVICE_BASE_URL:http://127.0.0.1:8080}
@@ -901,7 +909,7 @@ javert:
 Java：
 
 ```java
-@ConfigurationProperties(prefix = "javert.external.example-service")
+@ConfigurationProperties(prefix = "app.external.example-service")
 @Getter
 @Setter
 @Validated
@@ -928,8 +936,7 @@ public class ExampleServiceProperties {
 大型 Java 项目推荐：
 
 ```yaml
-javert:
-
+app:
   # ==============================
   # OCR
   # ==============================
@@ -986,7 +993,7 @@ basicComplianceApi:
 ### 34.2 Java 大量 `@Value`
 
 ```java
-@Value("${javert.xxx}")
+@Value("${app.xxx}")
 private String xxx;
 ```
 

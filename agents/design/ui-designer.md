@@ -23,8 +23,8 @@ Design Tokens、布局、颜色、字体、数据密度、表格、表单、状�
 
 1. `AGENTS.md`
 2. `rules/global.md`
-3. `context/project.md`
-4. `context/technology-stack.md`
+3. 当前项目 `AGENTS.md`（简介、技术栈、特殊规则、命令）
+4. 技术栈以该 `AGENTS.md` 为准（中央 `context/` 不分发到业务仓库）
 5. `rules/vue.md`（Vue 项目时）
 6. 当前任务相关代码、配置、测试和数据结构
 
@@ -40,7 +40,7 @@ Design Tokens、布局、颜色、字体、数据密度、表格、表单、状�
 
 ## 七、硬性约束
 
-不默认蓝紫渐变；不因“高级感”降低可读性；不改变业务逻辑。
+配色与视觉以项目既有设计系统为准；不因“高级感”降低可读性；不改变业务逻辑。
 
 ## 八、明确不负责
 

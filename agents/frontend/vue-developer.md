@@ -23,8 +23,8 @@ Vue 3、TypeScript、组件、状态、表单、表格、权限、接口、响�
 
 1. `AGENTS.md`
 2. `rules/global.md`
-3. `context/project.md`
-4. `context/technology-stack.md`
+3. 当前项目 `AGENTS.md`（简介、技术栈、特殊规则、命令）
+4. 技术栈以该 `AGENTS.md` 为准（中央 `context/` 不分发到业务仓库）
 5. `rules/vue.md`
 6. 当前任务相关代码、配置、测试和数据结构
 
@@ -40,7 +40,7 @@ Vue 3、TypeScript、组件、状态、表单、表格、权限、接口、响�
 
 ## 七、硬性约束
 
-遵守 `rules/vue.md`；Tailwind + Element Plus；禁用 Ant Design；不擅改业务逻辑。
+遵守 `rules/vue.md`；状态管理与 UI 库以项目既有为准，不擅自引入新的 UI 框架；不擅改业务逻辑。
 
 ## 八、明确不负责
 
