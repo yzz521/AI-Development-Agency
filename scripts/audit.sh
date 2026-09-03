@@ -13,8 +13,8 @@
 #   5. 规则反馈 kind 是否合法
 #   6. 验证命令仅列出供人工重跑（audit 不代跑，防报告注入命令）
 #
-# 局限（诚实声明）：audit 只能证明"汇报内部自洽、文件真实存在、有改动痕迹"，
-# 无法证明"AI 真的阅读了文件内容"——那需要人工抽查会话记录。
+# 局限（诚实声明）：audit 只能证明"汇报内部自洽、文件真实存在、有改动痕迹、回执格式对"，
+# 无法证明"AI 真的阅读了规则正文"——那需要人工抽查会话记录。
 # 退出码：FAIL=0 时返回 0。
 # ============================================================
 set -uo pipefail
@@ -80,6 +80,16 @@ for f in "$TASK_DIR"/*.md; do
   case "$level" in L1|L2|L3) ok "任务级别: $level";; *) fail "任务级别缺失/非法: ${level:-空}";; esac
   [ -n "$agent" ] && ok "使用 Agent: $agent"   || warn "未填写使用 Agent"
   [ -n "$wf" ]    && ok "使用 Workflow: $wf"   || warn "未填写使用 Workflow"
+
+  # 1b. 规范路由回执（证明会话里声称触发了路由；不证明读过原文）
+  receipt="$(grep -m1 '^agency-route:' "$f" || grep -m1 'agency-route: matched=' "$f" || true)"
+  if [ -z "$receipt" ]; then
+    warn "无规范路由回执（会话里可能没触发 agency-route / 未抄进任务单）"
+  elif printf '%s' "$receipt" | grep -qE 'agency-route: matched=.+ risk=L[123]'; then
+    ok "路由回执: $receipt"
+  else
+    warn "路由回执格式不完整: $receipt"
+  fi
 
   # 2. 实际读取的文件
   reads="$(section_lines "$f" "实际读取的文件" '- [ ] ')"

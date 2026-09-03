@@ -7,7 +7,8 @@ description: >
   page, component, SQL, YAML config, or bug. Also use when the user mentions
   规范, 按规范写, 路由, agency, 医保, DRG, Java, Vue, React, Python.
   Do NOT require the user to run agency CLI. Read the routing table and
-  摘要（注入用）yourself. Do NOT use for non-coding chat, translation, or
+  摘要（注入用）yourself. Also use when the user asks 有没有触发, 命中哪些规则,
+  路由探测, 这次用了哪条规范. Do NOT use for non-coding chat, translation, or
   general knowledge.
 ---
 
@@ -39,6 +40,7 @@ description: >
    - `agency route --task "<用户原话>" --files <已知文件>`
    - 不得因为 CLI 不在 PATH 而中断任务，也不得让用户去记这条命令
 5. 选最小必要 Agent 身份继续干活；调用本技能**不改变**当前角色。
+6. **写一行回执**（见退出）。这是给人核对「有没有触发」的唯一跨工具信号。
 
 ## 边界
 
@@ -47,8 +49,21 @@ description: >
 - 不把 `.ai/agency/` 整库读进上下文。
 - 非编码问题（翻译、闲聊、纯解释）不要触发。
 - 用户明确说「不要走规范 / 关掉路由」时停用本技能。
+- 用户说「只做路由探测 / 有没有触发 / 命中哪些规则」时：只输出回执和摘要，**不改代码**。
 
 ## 退出
 
-已确定 matched rules / agents / risk，并把摘要放进当前上下文后，**立即开始做任务**。
-不要停下来向用户汇报「我将使用某某 Agent」，除非用户问。
+写代码时，回复的**第一行**必须是这条可 grep 的回执，然后立刻动手（不要再解释将使用哪个 Agent）：
+
+```text
+agency-route: matched=<id,id> risk=<L1|L2|L3> rules=<paths> source=<skill|agents.md|mdc|cli>
+```
+
+例子：
+
+```text
+agency-route: matched=core,java risk=L2 rules=rules/global.md,rules/java.md source=skill
+```
+
+`source` 取你实际用的通道：技能 / 项目 AGENTS.md 路由段 / Cursor mdc / 跑了 `agency route`。
+没有命中语言规则时 `matched` 仍应包含 `core`。编造未读过的 rules 路径视为假回执。
