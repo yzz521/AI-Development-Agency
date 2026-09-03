@@ -12,8 +12,8 @@
 2. **只加载命中行的规则摘要**（本段已内嵌裁剪后的摘要）。
 3. 摘要不够再打开原文；不要把未命中的语言规范整篇塞进上下文。
 4. 每次都生效：`rules/global.md` + `rules/minimalism.md` + `rules/security.md`。
-5. 写代码回复的第一行必须是路由回执（给人核对有没有触发）：
-   `agency-route: matched=<id,id> risk=L2 rules=rules/java.md source=agents.md`
+5. 写代码回复的第一行必须是路由回执（给人核对有没有触发、有没有打开原文）：
+   `agency-route: matched=<id,id> risk=L2 rules=rules/java.md opened=rules/java.md source=agents.md`
 
 ### 信号表
 
@@ -145,4 +145,5 @@
 - 不要把 `.ai/agency/` 整库读进上下文。
 - 红线靠本摘要降低违规概率；真正强制是 `agency check`（git hook / CI），只卡增量、不卡存量。
 - 不要省略路由回执；没有 `agency-route:` 第一行，人无法核对本次是否触发。
+- 写代码时 `opened=` 必须是本会话真实打开过的规则原文；编造视为假回执。探测可 `opened=none`。
 <!-- agency-router:end -->

@@ -1,4 +1,17 @@
-# AI Development Agency — 总控规则 v1.6.0
+# AI Development Agency — 总控规则 v1.7.0
+
+<!-- agency-pin:begin -->
+## 写代码前（钉死，勿删）
+
+1. 先按「规范路由」匹配再动手，不必先跑 `agency` 命令。
+2. 只加载命中规则的摘要；**写代码时**命中的语言/领域规则必须再打开文内「原文路径」（摘要会丢掉约束）。探测任务 `opened=none`。
+3. 回复第一行：
+   `agency-route: matched=<id,id> risk=L2 rules=rules/java.md opened=rules/java.md source=agents.md`
+4. 常驻红线：先读再改；最小改动；密钥不进源码；SQL 参数化。
+5. 汇报：L1 三行；L2 短汇报；L3 完整表。业务仓无规则缺口则不写 feedback。
+6. 强制靠 `agency check`（只卡增量）。存量用 `agency check --all` 做台账，不进 hook。
+<!-- agency-pin:end -->
+
 
 ## 1. 项目定位
 
@@ -46,7 +59,7 @@
 8. 按 Agent 自身的“完成标准”自检。
 9. 必要时进行 QA / Security / Code Review。
 10. 汇总最终结果。
-11. 按 `rules/evolution.md` 记录规则反馈（`agency feedback`）；发现规则缺口时创建提案（`agency propose`）。
+11. 发现规则缺口/过时/违反时按 `rules/evolution.md` 记录反馈并提案。顺利的 L1/L2 不要为走流程写 feedback。
 
 ## 4. Agent 路由
 
@@ -120,8 +133,8 @@
 2. **只加载命中行的规则摘要**（本段已内嵌裁剪后的摘要）。
 3. 摘要不够再打开原文；不要把未命中的语言规范整篇塞进上下文。
 4. 每次都生效：`rules/global.md` + `rules/minimalism.md` + `rules/security.md`。
-5. 写代码回复的第一行必须是路由回执（给人核对有没有触发）：
-   `agency-route: matched=<id,id> risk=L2 rules=rules/java.md source=agents.md`
+5. 写代码回复的第一行必须是路由回执（给人核对有没有触发、有没有打开原文）：
+   `agency-route: matched=<id,id> risk=L2 rules=rules/java.md opened=rules/java.md source=agents.md`
 
 ### 信号表
 
@@ -253,6 +266,7 @@
 - 不要把 `.ai/agency/` 整库读进上下文。
 - 红线靠本摘要降低违规概率；真正强制是 `agency check`（git hook / CI），只卡增量、不卡存量。
 - 不要省略路由回执；没有 `agency-route:` 第一行，人无法核对本次是否触发。
+- 写代码时 `opened=` 必须是本会话真实打开过的规则原文；编造视为假回执。探测可 `opened=none`。
 <!-- agency-router:end -->
 
 ## 5. 风险等级
@@ -293,12 +307,24 @@
 4. 密钥不进源码、不进日志；外部输入不可信；SQL 必须参数化；API 必须认证、授权和输入校验。
 5. 关键逻辑必须有可验证路径；数据与日志最小必要。
 6. 有意简化必须 `agency: <上限>, <升级路径>` 留痕。
-7. 完成后说明改了什么、为什么、怎么验证、还有什么风险。规范要求的汇报完整写出。
-8. 规范库自身的任务必须按 `rules/evolution.md` 记录反馈；发现缺口必须提案。业务仓库建议记录，不强制每次。
+7. 汇报按风险：L1 三行（改了什么 / 怎么验证 / 风险）；L2 短汇报；L3 用 §7 完整表。用户未要求讲解时不要把 L1 写成 L3。
+8. 规范库自身发现规则缺口/过时/违反时必须 `agency feedback` 并在该升级时提案。业务仓库只在同样情况写反馈，不要为走流程写 `rule_applied`。
 
 Map / 魔法值 / 业务 PathVariable 等见 Java 条件加载摘要。数据库迁移见 SQL 摘要。医疗口径见医疗摘要。
 
-## 7. 最终汇报
+## 7. 汇报（按风险弹性）
+
+**L1**（三行即可，不要套下面整张表）：
+
+```text
+改了什么：
+怎么验证：
+风险：
+```
+
+**L2**：短汇报——任务、变更、验证、风险。Agent / Workflow / 规则反馈有就写，没有就省略。
+
+**L3** 以及规范库自身的破坏性/治理任务，用完整表：
 
 ```text
 任务：
@@ -314,3 +340,5 @@ Map / 魔法值 / 业务 PathVariable 等见 Java 条件加载摘要。数据库
 回滚方案：
 未完成事项：
 ```
+
+无规则缺口时「规则反馈」写「无」，不要编 `rule_applied`。

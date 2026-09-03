@@ -14,9 +14,9 @@
 - 使用 Agent：
 - 使用 Workflow：
 - 涉及规则：
-- 规范路由回执：`agency-route: matched=... risk=... rules=... source=...`
+- 规范路由回执：`agency-route: matched=... risk=... rules=... opened=... source=...`
 
-> 回执必须与本次会话第一行一致；没有回执 = 本次看不到自动路由是否触发。audit 会核对格式，不证明模型读过原文。
+> 回执必须与本次会话第一行一致。`opened=` 写真实打开过的规则原文；探测用 `none`。audit 核对格式，不证明模型读过原文。
 
 ## 实际读取的文件
 
@@ -40,17 +40,17 @@
 
 ## 规则反馈
 
-> 按 rules/evolution.md 记录；kind：rule_applied / rule_violated / rule_gap / rule_stale / workflow_ok / workflow_gap / context_gap
+> 有规则缺口/过时/违反才写；顺利的 L1/L2 写「无」。kind：rule_applied / rule_violated / rule_gap / rule_stale / workflow_ok / workflow_gap / context_gap
 
-- kind：
+- kind：无
 - 证据：
 
 ## 最终汇报
 
+按任务级别填写（总控 §7）：L1 三行；L2 短汇报；L3 完整表。
+
 ```text
-任务：
-修改：
-验证：
+改了什么：
+怎么验证：
 风险：
-未完成事项：
 ```

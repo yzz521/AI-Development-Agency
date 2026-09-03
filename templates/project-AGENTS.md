@@ -1,5 +1,18 @@
 # 项目 AI 开发规则
 
+<!-- agency-pin:begin -->
+## 写代码前（钉死，勿删）
+
+1. 先按「规范路由」匹配再动手，不必先跑 `agency` 命令。
+2. 只加载命中规则的摘要；**写代码时**命中的语言/领域规则必须再打开文内「原文路径」（摘要会丢掉约束）。探测任务 `opened=none`。
+3. 回复第一行：
+   `agency-route: matched=<id,id> risk=L2 rules=rules/java.md opened=rules/java.md source=agents.md`
+4. 常驻红线：先读再改；最小改动；密钥不进源码；SQL 参数化。
+5. 汇报：L1 三行；L2 短汇报；L3 完整表。业务仓无规则缺口则不写 feedback。
+6. 强制靠 `agency check`（只卡增量）。存量用 `agency check --all` 做台账，不进 hook。
+<!-- agency-pin:end -->
+
+
 ## 项目简介
 
 项目名称：
@@ -119,8 +132,8 @@ SQL Server：
 2. **只加载命中行的规则摘要**（本段已内嵌裁剪后的摘要）。
 3. 摘要不够再打开原文；不要把未命中的语言规范整篇塞进上下文。
 4. 每次都生效：`rules/global.md` + `rules/minimalism.md` + `rules/security.md`。
-5. 写代码回复的第一行必须是路由回执（给人核对有没有触发）：
-   `agency-route: matched=<id,id> risk=L2 rules=rules/java.md source=agents.md`
+5. 写代码回复的第一行必须是路由回执（给人核对有没有触发、有没有打开原文）：
+   `agency-route: matched=<id,id> risk=L2 rules=rules/java.md opened=rules/java.md source=agents.md`
 
 ### 信号表
 
@@ -252,4 +265,5 @@ SQL Server：
 - 不要把 `.ai/agency/` 整库读进上下文。
 - 红线靠本摘要降低违规概率；真正强制是 `agency check`（git hook / CI），只卡增量、不卡存量。
 - 不要省略路由回执；没有 `agency-route:` 第一行，人无法核对本次是否触发。
+- 写代码时 `opened=` 必须是本会话真实打开过的规则原文；编造视为假回执。探测可 `opened=none`。
 <!-- agency-router:end -->

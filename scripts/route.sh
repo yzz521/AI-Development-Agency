@@ -18,6 +18,8 @@ AGENCY_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 TABLE="$AGENCY_ROOT/routes/table.tsv"
 ROUTER_BEGIN="<!-- agency-router:begin -->"
 ROUTER_END="<!-- agency-router:end -->"
+PIN_BEGIN="<!-- agency-pin:begin -->"
+PIN_END="<!-- agency-pin:end -->"
 
 usage() { sed -n '3,16p' "$0" | sed 's/^# \{0,1\}//'; }
 
@@ -342,7 +344,7 @@ print_route_report() {
   local dir="$1" task="$2" files="$3" stack="$4" match_file="$5"
   collect_from_matches "$match_file"
   echo "══ agency route ══"
-  echo "agency-route: matched=${IDS_OUT:-none} risk=${RISK_OUT:-L1} rules=${RULES_OUT:-} source=cli"
+  echo "agency-route: matched=${IDS_OUT:-none} risk=${RISK_OUT:-L1} rules=${RULES_OUT:-} opened=suggest:${RULES_OUT:-none} source=cli"
   echo "project: $dir"
   [ -n "$task" ] && echo "task: $task"
   [ -n "$files" ] && echo "files: $files"
@@ -437,6 +439,22 @@ EOF
   done < "$TABLE"
 }
 
+render_pin_markdown() {
+  cat <<EOF
+$PIN_BEGIN
+## 写代码前（钉死，勿删）
+
+1. 先按「规范路由」匹配再动手，不必先跑 \`agency\` 命令。
+2. 只加载命中规则的摘要；**写代码时**命中的语言/领域规则必须再打开文内「原文路径」（摘要会丢掉约束）。探测任务 \`opened=none\`。
+3. 回复第一行：
+   \`agency-route: matched=<id,id> risk=L2 rules=rules/java.md opened=rules/java.md source=agents.md\`
+4. 常驻红线：先读再改；最小改动；密钥不进源码；SQL 参数化。
+5. 汇报：L1 三行；L2 短汇报；L3 完整表。业务仓无规则缺口则不写 feedback。
+6. 强制靠 \`agency check\`（只卡增量）。存量用 \`agency check --all\` 做台账，不进 hook。
+$PIN_END
+EOF
+}
+
 render_router_markdown() {
   local stacks="$1"
   local stack_note="检测技术栈：${stacks:-未检测，保留全表}"
@@ -455,8 +473,8 @@ $stack_note
 2. **只加载命中行的规则摘要**（本段已内嵌裁剪后的摘要）。
 3. 摘要不够再打开原文；不要把未命中的语言规范整篇塞进上下文。
 4. 每次都生效：\`rules/global.md\` + \`rules/minimalism.md\` + \`rules/security.md\`。
-5. 写代码回复的第一行必须是路由回执（给人核对有没有触发）：
-   \`agency-route: matched=<id,id> risk=L2 rules=rules/java.md source=agents.md\`
+5. 写代码回复的第一行必须是路由回执（给人核对有没有触发、有没有打开原文）：
+   \`agency-route: matched=<id,id> risk=L2 rules=rules/java.md opened=rules/java.md source=agents.md\`
 
 ### 信号表
 
@@ -476,6 +494,7 @@ EOF
 - 不要把 \`.ai/agency/\` 整库读进上下文。
 - 红线靠本摘要降低违规概率；真正强制是 \`agency check\`（git hook / CI），只卡增量、不卡存量。
 - 不要省略路由回执；没有 \`agency-route:\` 第一行，人无法核对本次是否触发。
+- 写代码时 \`opened=\` 必须是本会话真实打开过的规则原文；编造视为假回执。探测可 \`opened=none\`。
 $ROUTER_END
 EOF
 }
@@ -484,31 +503,35 @@ render_cursor_mdc() {
   local stacks="$1"
   cat <<EOF
 ---
-description: Agency 规范路由。写代码前按任务/文件匹配规则摘要，不要整库加载。提示词自动生效，用户不必先跑命令。
+description: Agency 规范路由。写代码前按任务/文件匹配规则摘要，摘要不够再打开原文。提示词自动生效，用户不必先跑命令。
 alwaysApply: true
 ---
 
 EOF
+  render_pin_markdown | grep -v 'agency-pin:'
+  echo
   render_router_markdown "$stacks" | grep -v 'agency-router:'
 }
 
 upsert_marked_section() {
   local file="$1"
   local snippet_file="$2"
+  local begin="${3:-agency-router:begin}"
+  local end="${4:-agency-router:end}"
   if [ ! -f "$file" ]; then
     cp "$snippet_file" "$file"
     return 0
   fi
-  if grep -q 'agency-router:begin' "$file"; then
+  if grep -q "$begin" "$file"; then
     local tmp; tmp="$(mktemp)"
-    awk -v snippet="$snippet_file" '
-      /agency-router:begin/ {
+    awk -v snippet="$snippet_file" -v begin="$begin" -v end="$end" '
+      index($0, begin) {
         skip=1
         while ((getline line < snippet) > 0) print line
         close(snippet)
         next
       }
-      /agency-router:end/ { skip=0; next }
+      index($0, end) { skip=0; next }
       skip { next }
       { print }
     ' "$file" > "$tmp"
@@ -517,6 +540,39 @@ upsert_marked_section() {
     echo >> "$file"
     cat "$snippet_file" >> "$file"
   fi
+}
+
+upsert_pin_at_head() {
+  local file="$1"
+  local snippet_file="$2"
+  if [ ! -f "$file" ]; then
+    cp "$snippet_file" "$file"
+    return 0
+  fi
+  if grep -q 'agency-pin:begin' "$file"; then
+    upsert_marked_section "$file" "$snippet_file" "agency-pin:begin" "agency-pin:end"
+    return 0
+  fi
+  local tmp; tmp="$(mktemp)"
+  awk -v snippet="$snippet_file" '
+    /^# / && !done {
+      print
+      print ""
+      while ((getline line < snippet) > 0) print line
+      close(snippet)
+      print ""
+      done=1
+      next
+    }
+    { print }
+    END {
+      if (!done) {
+        while ((getline line < snippet) > 0) print line
+        close(snippet)
+      }
+    }
+  ' "$file" > "$tmp"
+  mv "$tmp" "$file"
 }
 
 cmd_print() {
@@ -544,16 +600,19 @@ cmd_install() {
   local stacks_for_summary="$stack"
   [ -z "$stacks_for_summary" ] && stacks_for_summary="java,vue,react,python,sqlserver,ai,healthcare,any"
 
-  local snippet; snippet="$(mktemp)"
+  local snippet pin; snippet="$(mktemp)"; pin="$(mktemp)"
   render_router_markdown "$stacks_for_summary" > "$snippet"
+  render_pin_markdown > "$pin"
 
   if [ -f "$dir/AGENTS.md" ]; then
+    upsert_pin_at_head "$dir/AGENTS.md" "$pin"
     upsert_marked_section "$dir/AGENTS.md" "$snippet"
-    echo "✓ 更新 $dir/AGENTS.md 规范路由段"
+    echo "✓ 更新 $dir/AGENTS.md 写代码前钉死段 + 规范路由段"
   else
     cp "$AGENCY_ROOT/templates/project-AGENTS.md" "$dir/AGENTS.md"
+    upsert_pin_at_head "$dir/AGENTS.md" "$pin"
     upsert_marked_section "$dir/AGENTS.md" "$snippet"
-    echo "✓ 创建 $dir/AGENTS.md（含规范路由段）"
+    echo "✓ 创建 $dir/AGENTS.md（含钉死段与规范路由段）"
   fi
 
   mkdir -p "$dir/.cursor/rules"
@@ -565,21 +624,24 @@ cmd_install() {
   cp -R "$AGENCY_ROOT/skills/agency-route" "$dir/.agents/skills/agency-route"
   echo "✓ 写入 $dir/.agents/skills/agency-route/"
 
-  rm -f "$snippet"
+  rm -f "$snippet" "$pin"
   echo "完成：提示词自动路由已写入项目（可提交 AGENTS.md / .cursor/rules / .agents/skills）"
   echo "技术栈: ${stack:-未检测，已写入全量摘要}"
 }
 
 cmd_refresh_docs() {
   local stacks="java,vue,react,python,sqlserver,ai,healthcare,any"
-  local snippet; snippet="$(mktemp)"
+  local snippet pin; snippet="$(mktemp)"; pin="$(mktemp)"
   render_router_markdown "$stacks" > "$snippet"
+  render_pin_markdown > "$pin"
 
+  upsert_pin_at_head "$AGENCY_ROOT/AGENTS.md" "$pin"
   upsert_marked_section "$AGENCY_ROOT/AGENTS.md" "$snippet"
-  echo "✓ 刷新 AGENTS.md 规范路由段"
+  echo "✓ 刷新 AGENTS.md 钉死段 + 规范路由段"
 
+  upsert_pin_at_head "$AGENCY_ROOT/templates/project-AGENTS.md" "$pin"
   upsert_marked_section "$AGENCY_ROOT/templates/project-AGENTS.md" "$snippet"
-  echo "✓ 刷新 templates/project-AGENTS.md 规范路由段"
+  echo "✓ 刷新 templates/project-AGENTS.md 钉死段 + 规范路由段"
 
   mkdir -p "$AGENCY_ROOT/templates/cursor-rules"
   render_cursor_mdc "$stacks" > "$AGENCY_ROOT/templates/cursor-rules/agency-router.mdc"
@@ -588,7 +650,7 @@ cmd_refresh_docs() {
   cp "$snippet" "$AGENCY_ROOT/templates/project-router-section.md"
   echo "✓ 刷新 templates/project-router-section.md"
 
-  rm -f "$snippet"
+  rm -f "$snippet" "$pin"
 }
 
 # ---------- 参数 ----------

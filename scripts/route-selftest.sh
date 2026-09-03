@@ -13,6 +13,7 @@ out="$("$ROUTE" --dir "$ROOT" --task "x" --files Foo.java --stack java)"
 assert_has "$out" "rules/java.md"
 assert_has "$out" "java-developer"
 assert_has "$out" "agency-route: matched=core,java"
+assert_has "$out" "opened=suggest:"
 assert_has "$out" "Controller 接收完整 DTO"
 assert_no "$out" "rules/react.md"
 assert_no "$out" "rules/vue.md"
@@ -48,6 +49,11 @@ grep -q '^### rules/java.md$' "$tmp/AGENTS.md" || { rm -rf "$tmp"; fail "install
 if grep -q '^### rules/react.md$' "$tmp/AGENTS.md"; then rm -rf "$tmp"; fail "java 项目不该写入 react 摘要"; fi
 if grep -q '^### rules/vue.md$' "$tmp/AGENTS.md"; then rm -rf "$tmp"; fail "java 项目不该写入 vue 摘要"; fi
 grep -q '检测技术栈：java$' "$tmp/AGENTS.md" || { rm -rf "$tmp"; fail "二次 install 技术栈被路由段污染"; }
+grep -q 'agency-pin:begin' "$tmp/AGENTS.md" || { rm -rf "$tmp"; fail "install 未写入钉死段"; }
+pin_n="$(grep -n 'agency-pin:begin' "$tmp/AGENTS.md" | head -1 | cut -d: -f1)"
+rt_n="$(grep -n 'agency-router:begin' "$tmp/AGENTS.md" | head -1 | cut -d: -f1)"
+[ -n "$pin_n" ] && [ -n "$rt_n" ] && [ "$pin_n" -lt "$rt_n" ] \
+  || { rm -rf "$tmp"; fail "钉死段应在路由段之前"; }
 rm -rf "$tmp"
 
 out="$("$ROUTE" --dir "$ROOT" --task "慢查询优化执行计划" --stack java)"

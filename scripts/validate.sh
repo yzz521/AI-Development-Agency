@@ -138,6 +138,7 @@ else
   fail "缺少 routes/table.tsv"
 fi
 grep -q 'agency-router:begin' AGENTS.md && ok "AGENTS.md 含路由段标记" || fail "AGENTS.md 缺 agency-router 标记"
+grep -q 'agency-pin:begin' AGENTS.md && ok "AGENTS.md 含钉死段标记" || fail "AGENTS.md 缺 agency-pin 标记"
 [ -f skills/agency-route/SKILL.md ] && ok "skills/agency-route" || fail "缺少 agency-route 技能"
 [ -f contracts/route-contract.md ] && ok "contracts/route-contract.md" || fail "缺少路由契约"
 
