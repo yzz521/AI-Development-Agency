@@ -1,7 +1,7 @@
 # AI Development Agency
 
 > 面向企业软件研发的 AI 虚拟研发团队规范库。  
-> 当前版本：**v1.6.0**
+> 当前版本：**v1.7.0**
 
 AI Development Agency 不是新的 AI Coding Runtime，也不是把多个 Agent 强行绑定在一起的框架。
 
@@ -118,7 +118,7 @@ agency route --task "给审核加一个查询接口" --files Foo.java
 # 5) 可选、单独执行：增量门禁（hook + CI，不绑进 init）
 agency check --install ~/workspace/你的项目
 
-# 6) 收工：记录规则使用反馈（自进化的起点）
+# 6) 有规则缺口时才记反馈（不要每次 rule_applied 走流程）
 agency feedback --kind rule_gap --detail "遇到的问题"
 ```
 

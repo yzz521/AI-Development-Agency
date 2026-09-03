@@ -14,7 +14,7 @@
 #   6. 验证命令仅列出供人工重跑（audit 不代跑，防报告注入命令）
 #
 # 局限（诚实声明）：audit 只能证明"汇报内部自洽、文件真实存在、有改动痕迹、回执格式对"，
-# 无法证明"AI 真的阅读了规则正文"——那需要人工抽查会话记录。
+# 无法证明"AI 真的阅读了规则正文"——那需要看会话里 \`opened=\` 是否对应真实 Read，并人工抽查。
 # 退出码：FAIL=0 时返回 0。
 # ============================================================
 set -uo pipefail
@@ -85,8 +85,10 @@ for f in "$TASK_DIR"/*.md; do
   receipt="$(grep -m1 '^agency-route:' "$f" || grep -m1 'agency-route: matched=' "$f" || true)"
   if [ -z "$receipt" ]; then
     warn "无规范路由回执（会话里可能没触发 agency-route / 未抄进任务单）"
-  elif printf '%s' "$receipt" | grep -qE 'agency-route: matched=.+ risk=L[123]'; then
+  elif printf '%s' "$receipt" | grep -qE 'agency-route: matched=.+ risk=L[123].*opened='; then
     ok "路由回执: $receipt"
+  elif printf '%s' "$receipt" | grep -qE 'agency-route: matched=.+ risk=L[123]'; then
+    warn "路由回执缺 opened=（写代码应打开语言/领域原文；探测用 opened=none）: $receipt"
   else
     warn "路由回执格式不完整: $receipt"
   fi
@@ -155,7 +157,8 @@ for f in "$TASK_DIR"/*.md; do
   case "$kind" in
     rule_applied|rule_violated|rule_gap|rule_stale|workflow_ok|workflow_gap|context_gap)
       ok "规则反馈: $kind";;
-    "") warn "未填写规则反馈（自进化闭环缺失）";;
+    ""|无|无。)
+      [ "$level" = "L3" ] && warn "L3 未填写规则反馈（有缺口才必须写）" || ok "规则反馈：无（L1/L2 允许）";;
     *) fail "非法规则反馈 kind: $kind";;
   esac
 

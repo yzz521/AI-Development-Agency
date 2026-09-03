@@ -2,6 +2,16 @@
 
 所有规则/规范变更记录于此。版本语义见 `rules/evolution.md`（MAJOR=破坏性，MINOR=新增，PATCH=澄清/修正）。
 
+## v1.7.0（2026-09-03）
+
+**弹性汇报 + 总控置顶 + 打开原文可核验（MINOR）**
+
+- 汇报按风险：L1 三行、L2 短汇报、L3 完整表。业务仓无规则缺口不写 `rule_applied` 走流程。
+- `AGENTS.md` 文首钉死最短总控（`<!-- agency-pin:begin -->`），`--install` / `--refresh-docs` 写入；防长文被截断后路由整段消失。
+- 写代码回执增加 `opened=`：必须是本会话打开过的语言/领域原文；探测 `opened=none`。CLI 打印 `opened=suggest:`。
+- 存量：保持增量门禁；手册 §2.3 规定用 `agency check --all` 按月出台账，不按库龄自动 FAIL，不把 `--all` 接进 hook/CI。
+- 不预先堆框架写代码技能。DeepSeek Harness 自动入口本版不做。
+
 ## v1.6.0（2026-09-03）
 
 **增量规范门禁：只卡 diff，不卡存量（MINOR）**
