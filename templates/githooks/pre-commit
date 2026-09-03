@@ -1,0 +1,21 @@
+#!/bin/sh
+# Agency 增量门禁。只检查暂存区新增行，不扫存量。
+# 本文件可提交。每个 clone 需要一次：
+#   git config core.hooksPath .githooks
+# 若使用 husky，把下面的调用并进 .husky/pre-commit，不要改 core.hooksPath。
+set -e
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT" || exit 1
+
+if [ -f "$ROOT/.agency-check/check.sh" ]; then
+  exec bash "$ROOT/.agency-check/check.sh" --dir "$ROOT" --staged
+fi
+if command -v agency >/dev/null 2>&1; then
+  exec agency check --dir "$ROOT" --staged
+fi
+if [ -x "$ROOT/.ai/agency/scripts/check.sh" ]; then
+  exec bash "$ROOT/.ai/agency/scripts/check.sh" --dir "$ROOT" --staged
+fi
+
+echo "agency check 不可用：请保留 .agency-check/ 或安装 agency CLI。" >&2
+exit 1

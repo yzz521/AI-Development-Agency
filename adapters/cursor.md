@@ -29,3 +29,5 @@ agency route --install /path/to/project
 ## 与 CLI 的关系
 
 `agency route` 只是同一张 `routes/table.tsv` 的检查器。智能体读 `AGENTS.md` / mdc / 技能即可工作。
+
+强制层与工具无关：`agency check --install` 写入 hook + CI，只卡增量。见 `contracts/check-contract.md`。

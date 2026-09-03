@@ -40,4 +40,5 @@ else
   echo "✓ 已存在 AGENTS.md，不覆盖正文（路由段可由下一步刷新）"
 fi
 "$SCRIPT_DIR/route.sh" --install "$PROJECT_DIR"
+echo "提示：规范门禁另跑 agency check --install（只卡增量，不自动绑进 init）"
 echo "完成：$PROJECT_DIR"

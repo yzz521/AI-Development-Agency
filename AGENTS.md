@@ -1,4 +1,4 @@
-# AI Development Agency — 总控规则 v1.5.2
+# AI Development Agency — 总控规则 v1.6.0
 
 ## 1. 项目定位
 
@@ -251,7 +251,7 @@
 
 - 不要为了「走完流程」加载全部 Agent Prompt。
 - 不要把 `.ai/agency/` 整库读进上下文。
-- 红线靠本摘要降低违规概率；真正强制仍是 git hook / CI。
+- 红线靠本摘要降低违规概率；真正强制是 `agency check`（git hook / CI），只卡增量、不卡存量。
 - 不要省略路由回执；没有 `agency-route:` 第一行，人无法核对本次是否触发。
 <!-- agency-router:end -->
 

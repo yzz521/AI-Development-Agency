@@ -1,7 +1,7 @@
 # AI Development Agency
 
 > 面向企业软件研发的 AI 虚拟研发团队规范库。  
-> 当前版本：**v1.5.2**
+> 当前版本：**v1.6.0**
 
 AI Development Agency 不是新的 AI Coding Runtime，也不是把多个 Agent 强行绑定在一起的框架。
 
@@ -90,9 +90,10 @@ AI-Development-Agency/
 ├── validation/               # 验证与质量检查（scripts/validate.sh 门禁）
 ├── evolution/                # 规则自进化（feedback / proposals / archive / metrics）
 ├── routes/                   # 任务/文件 → 规范 的单一路由表
-├── skills/                   # 场景技能层（agency-route 在写代码时自动匹配）
+├── checks/                   # 增量门禁规则表（catalog.tsv）
+├── skills/                   # 场景技能层（agency-route / agency-check）
 ├── scripts/                  # 工具链：agency CLI + 初始化 / 校验 / 进化脚本
-├── templates/                # 项目 AGENTS.md / 提案等模板
+├── templates/                # 项目 AGENTS.md / hook / CI / 提案等模板
 ├── docs/                     # 使用手册、规则清单、批量初始化、团队推广方案、载体归属迁移清单
 ├── CHANGELOG.md              # 规则版本变更记录
 └── .github/                  # CI（validate.yml 规范守门）
@@ -114,12 +115,15 @@ agency init ~/workspace/你的项目
 # 4) 可选：检查这次任务会命中哪些摘要
 agency route --task "给审核加一个查询接口" --files Foo.java
 
-# 5) 收工：记录规则使用反馈（自进化的起点）
+# 5) 可选、单独执行：增量门禁（hook + CI，不绑进 init）
+agency check --install ~/workspace/你的项目
+
+# 6) 收工：记录规则使用反馈（自进化的起点）
 agency feedback --kind rule_gap --detail "遇到的问题"
 ```
 
-> 完整日常用法见 `docs/日常使用手册.md`（含「怎么知道规范有没有被用到」）；校验规范库用 `agency validate`。
-> 当前有哪些硬规则、想删哪些，见 `docs/规则清单.md`。
+> 完整日常用法见 `docs/日常使用手册.md`（含「怎么知道规范有没有被用到」和「门禁怎么做」）；校验规范库用 `agency validate`。
+> 当前有哪些硬规则、想删哪些，见 `docs/规则清单.md`。增量门禁见 `agency check` / `contracts/check-contract.md`。
 
 ## 5. 当前覆盖的角色
 
@@ -460,7 +464,7 @@ agency-curator 评审合并（evolution-review workflow）
 
 ```bash
 mkdir -p ~/.agents/skills
-for s in debt diff-review task-audit agency-task agency-feedback agency-route; do
+for s in debt diff-review task-audit agency-task agency-feedback agency-route agency-check; do
   ln -sfn ~/workspace/AI-Development-Agency/skills/$s ~/.agents/skills/$s
 done
 ```
@@ -470,7 +474,7 @@ done
 - 技能必须带 frontmatter（`name` + `description`）才会被发现，详见 `skills/README.md`。
 
 > 常驻红线规范不要做成技能（技能是按需触发，漏一次即失效），应进项目根目录
-> `AGENTS.md`；真正的强制靠 git hooks + CI。载体如何归属见
+> `AGENTS.md`；真正的强制靠 `agency check`（git hooks + CI，只卡增量）。载体如何归属见
 > `docs/载体归属迁移清单.md`，团队推广路径见 `docs/团队推广方案.md`。
 
 ## 16. 最终目标

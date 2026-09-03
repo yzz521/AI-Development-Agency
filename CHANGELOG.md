@@ -2,6 +2,17 @@
 
 所有规则/规范变更记录于此。版本语义见 `rules/evolution.md`（MAJOR=破坏性，MINOR=新增，PATCH=澄清/修正）。
 
+## v1.6.0（2026-09-03）
+
+**增量规范门禁：只卡 diff，不卡存量（MINOR）**
+
+- 新增 `agency check`：按 `checks/catalog.tsv` 扫描 **git diff 新增行**。默认只开 `java-map-object` / `sql-select-star` / `secret-hardcoded`。
+- `--staged` 给 pre-commit，`--base` 给 CI，`--all` 只做存量台账。
+- `--install` 写入可提交的 `.agency-check/`、`.githooks/pre-commit`、`.github/workflows/agency-check.yml`、`agency-check.conf`；**不绑进** `agency init`。
+- **破坏性别名**：`agency check` 不再等于 `agency status`/`doctor`。接入体检请用 `agency status` 或 `agency doctor`。
+- 不做机检：魔法值、DTO 语义、医疗口径；Javert 专有规则不进中央默认 on。
+- 技能 `agency-check`；契约 `contracts/check-contract.md`。
+
 ## v1.5.2（2026-09-03）
 
 **路由回执：让「有没有触发」看得见（PATCH）**

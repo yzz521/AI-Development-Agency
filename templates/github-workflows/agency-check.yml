@@ -1,0 +1,42 @@
+# Agency 增量规范门禁。只卡相对 base 的新增行，不卡存量。
+# 由 `agency check --install` 写入。若无法使用 GitHub Actions，
+# 在 GitLab/Jenkins 里等价执行：
+#   bash .agency-check/check.sh --base origin/main
+name: agency-check
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+
+jobs:
+  agency-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Incremental spec gate
+        run: |
+          set -euo pipefail
+          if [ ! -f .agency-check/check.sh ]; then
+            echo "缺少 .agency-check/check.sh。在项目根执行: agency check --install" >&2
+            exit 1
+          fi
+          if [ -n "${GITHUB_BASE_REF:-}" ]; then
+            git fetch origin "$GITHUB_BASE_REF" --depth=1
+            BASE="origin/${GITHUB_BASE_REF}"
+          elif git rev-parse --verify origin/main >/dev/null 2>&1; then
+            BASE=origin/main
+          elif git rev-parse --verify origin/master >/dev/null 2>&1; then
+            BASE=origin/master
+          elif git rev-parse --verify HEAD^ >/dev/null 2>&1; then
+            BASE=HEAD^
+          else
+            echo "无法确定对比基线，退回 --all（仅空仓库首次提交）"
+            bash .agency-check/check.sh --dir . --all
+            exit $?
+          fi
+          bash .agency-check/check.sh --dir . --base "$BASE"

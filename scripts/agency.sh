@@ -5,6 +5,8 @@
 # 用法：
 #   agency help                    帮助
 #   agency status [dir]            检查项目接入状态（doctor）
+#   agency doctor [dir]            同上（原 agency check 别名已让给门禁）
+#   agency check [dir]             增量规范门禁（只卡 diff；--install 写入 hook/CI）
 #   agency init [dir]              初始化项目接入（软链接 + AGENTS.md）
 #   agency list [agents|rules|workflows|context]   列出分类内容
 #   agency use <agent> [--raw]     组装并打印某 Agent 的完整使用块（可选；提示词会自动路由）
@@ -37,7 +39,7 @@ SCRIPT_DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
 AGENCY_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 usage() {
-  sed -n '3,26p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '3,28p' "$0" | sed 's/^# \{0,1\}//'
 }
 
 version_of() {
@@ -141,6 +143,7 @@ cmd_debt()     { "$SCRIPT_DIR/debt.sh" "${1:-}"; }
 cmd_review()   { "$SCRIPT_DIR/review.sh" "$@"; }
 cmd_validate() { "$SCRIPT_DIR/validate.sh"; }
 cmd_route()    { "$SCRIPT_DIR/route.sh" "$@"; }
+cmd_check()    { "$SCRIPT_DIR/check.sh" "$@"; }
 
 cmd_changelog() {
   local f="$AGENCY_ROOT/CHANGELOG.md"
@@ -158,7 +161,8 @@ cmd="${1:-help}"; shift || true
 case "$cmd" in
   help|-h|--help)        cmd_help;;
   version|-v)            cmd_version;;
-  status|check|doctor)   cmd_status "${1:-}";;
+  status|doctor)         cmd_status "${1:-}";;
+  check|gate)            cmd_check "$@";;
   init)                  cmd_init "${1:-}";;
   list|ls)               cmd_list "${1:-}";;
   use)                   cmd_use "${1:-}" "${2:-}";;

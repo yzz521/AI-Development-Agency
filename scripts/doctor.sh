@@ -22,4 +22,20 @@ elif [ -e "$LINK" ]; then fail ".ai/agency 不是软链接"; else fail "缺少 .
 [ -d "$LINK/rules" ] && ok "rules/" || fail "rules/ 不可访问"
 [ -d "$LINK/workflows" ] && ok "workflows/" || fail "workflows/ 不可访问"
 [ -f "$PROJECT_DIR/pom.xml" ] || [ -f "$PROJECT_DIR/build.gradle" ] || [ -f "$PROJECT_DIR/build.gradle.kts" ] && ok "Java 构建文件" || warn "未检测到 Maven/Gradle 根文件"
+if [ -f "$PROJECT_DIR/.agency-check/check.sh" ] || [ -f "$PROJECT_DIR/agency-check.conf" ]; then
+  ok "增量门禁文件"
+  if [ -f "$PROJECT_DIR/.githooks/pre-commit" ]; then
+    hp="$(git -C "$PROJECT_DIR" config --get core.hooksPath 2>/dev/null || true)"
+    if [ "$hp" = ".githooks" ]; then
+      ok "core.hooksPath=.githooks"
+    else
+      warn "有 .githooks/pre-commit 但未 git config core.hooksPath .githooks（CI 仍可拦）"
+    fi
+  else
+    warn "有门禁配置但无 .githooks/pre-commit"
+  fi
+  [ -f "$PROJECT_DIR/.github/workflows/agency-check.yml" ] && ok "CI agency-check.yml" || warn "无 .github/workflows/agency-check.yml"
+else
+  warn "未安装增量门禁（需要时: agency check --install；不绑进 init）"
+fi
 echo; echo "PASS=$PASS WARN=$WARN FAIL=$FAIL"; [ "$FAIL" -eq 0 ]

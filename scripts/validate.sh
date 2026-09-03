@@ -37,7 +37,7 @@ ref_ok() {
 echo "== 校验规范库：$AGENCY_ROOT =="
 
 # 1. 结构完整性
-for d in agents rules workflows context contracts artifacts validation evolution templates scripts routes skills; do
+for d in agents rules workflows context contracts artifacts validation evolution templates scripts routes skills checks; do
   [ -d "$d" ] && ok "目录 $d/" || fail "缺少目录 $d/"
 done
 [ -f AGENTS.md ] && ok "AGENTS.md" || fail "缺少 AGENTS.md"
@@ -183,6 +183,37 @@ if bash scripts/route-selftest.sh >/tmp/agency-route-selftest.log 2>&1; then
 else
   fail "route-selftest 失败（见 /tmp/agency-route-selftest.log）"
   cat /tmp/agency-route-selftest.log >&2 || true
+fi
+
+# 12. 增量门禁 catalog + 技能 + 契约
+echo "── 增量门禁 ──"
+[ -f checks/catalog.tsv ] && ok "checks/catalog.tsv" || fail "缺少 checks/catalog.tsv"
+[ -f scripts/check.sh ] && ok "scripts/check.sh" || fail "缺少 scripts/check.sh"
+[ -f contracts/check-contract.md ] && ok "contracts/check-contract.md" || fail "缺少门禁契约"
+[ -f skills/agency-check/SKILL.md ] && ok "skills/agency-check" || fail "缺少 agency-check 技能"
+[ -f templates/githooks/pre-commit ] && ok "templates/githooks/pre-commit" || fail "缺少 hook 模板"
+[ -f templates/github-workflows/agency-check.yml ] && ok "templates/github-workflows/agency-check.yml" || fail "缺少 CI 模板"
+[ -f templates/agency-check.conf ] && ok "templates/agency-check.conf" || fail "缺少 agency-check.conf 模板"
+grep -q '^name: agency-check$' skills/agency-check/SKILL.md && ok "agency-check frontmatter" || fail "agency-check 缺 name frontmatter"
+
+check_bad=0
+while IFS= read -r line || [ -n "$line" ]; do
+  case "$line" in \#*|"") continue;; esac
+  IFS='|' read -r id default severity globs engine rule message <<EOF
+$line
+EOF
+  [ -n "$id" ] || { fail "门禁表空 id: $line"; check_bad=$((check_bad+1)); continue; }
+  case "$default" in on|off) ;; *) fail "门禁表 $id 非法 default: $default"; check_bad=$((check_bad+1));; esac
+  [ -f "$rule" ] || { fail "门禁表 $id 规则缺失: $rule"; check_bad=$((check_bad+1)); }
+  grep -q "${engine})" scripts/check.sh || { fail "门禁表 $id engine 未实现: $engine"; check_bad=$((check_bad+1)); }
+done < checks/catalog.tsv
+[ "$check_bad" -eq 0 ] && ok "门禁表引用与 engine 可解析"
+
+if bash scripts/check-selftest.sh >/tmp/agency-check-selftest.log 2>&1; then
+  ok "check-selftest"
+else
+  fail "check-selftest 失败（见 /tmp/agency-check-selftest.log）"
+  cat /tmp/agency-check-selftest.log >&2 || true
 fi
 
 echo

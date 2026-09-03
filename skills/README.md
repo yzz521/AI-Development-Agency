@@ -42,6 +42,7 @@ description: 一句话说明「做什么 + 什么时候用」，把触发词嵌�
 | 技能 | 场景 | 过程 |
 | --- | --- | --- |
 | `skills/agency-route/SKILL.md` | 写代码 / 改接口 / 改页面 | 读路由表，注入命中规则的摘要；**不要求用户跑 CLI** |
+| `skills/agency-check/SKILL.md` | 门禁 / hook / CI / 增量检查 | 跑 `agency check`；技能无强制力，强制靠 hook+CI |
 | `skills/debt/SKILL.md` | 收割债务 / 清单简化的债 | 跑 `agency debt` 输出台账 |
 | `skills/task-audit/SKILL.md` | 查 AI 是否真实执行 / 审计任务单 | 跑 `agency audit` + 解读 |
 | `skills/diff-review/SKILL.md` | review 改动 / 查过度设计 | 只审 diff 的过度设计 |
