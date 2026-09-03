@@ -1,5 +1,14 @@
 # Vue Rules
 
+## 摘要（注入用）
+
+- Vue 3 + Composition API + `<script setup>`。
+- API 用明确 TypeScript 类型，不用 `any` / 无约束对象传业务数据。
+- 状态优先组件本地，跨页再 Pinia；异步必须覆盖 loading / empty / error / retry。
+- 表格筛选分页优先复用项目已有模式；不为视觉效果改业务逻辑。
+
+## 全文
+
 1. Vue 3 + Composition API + `<script setup>` 为默认。
 2. 页面、业务组件、基础组件职责分离。
 3. API 参数使用明确 TypeScript 类型，不使用无约束 `any` / Map 式对象传递业务数据。

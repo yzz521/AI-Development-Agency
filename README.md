@@ -1,11 +1,11 @@
 # AI Development Agency
 
 > 面向企业软件研发的 AI 虚拟研发团队规范库。  
-> 当前版本：**v1.4.1**
+> 当前版本：**v1.5.0**
 
 AI Development Agency 不是新的 AI Coding Runtime，也不是把多个 Agent 强行绑定在一起的框架。
 
-它是一套可以被 **Codex、Reasonix、DeepSeek Harness** 等 AI Coding 工具共同使用的“AI 研发团队规范”：把研发岗位、技术规则、工作流程和项目背景整理成结构化 Markdown，让 AI 在真实项目中按照统一方法完成研发工作。
+它是一套可以被 **Cursor、Codex、Reasonix、DeepSeek Harness** 等 AI Coding 工具共同使用的“AI 研发团队规范”：把研发岗位、技术规则、工作流程和项目背景整理成结构化 Markdown，让 AI 在真实项目中按照统一方法完成研发工作。
 
 ## 1. 核心理念
 
@@ -23,15 +23,11 @@ AI Development Agency 不是新的 AI Coding Runtime，也不是把多个 Agent 
 核心关系：
 
 ```text
-任务
+任务（直接下，不必先跑命令）
  ↓
-判断任务类型 / 风险等级
+规范路由（AGENTS.md / Cursor 规则 / agency-route 技能）
  ↓
-选择 Agent
- ↓
-加载 Rule
- ↓
-选择 Workflow
+注入命中规则的摘要
  ↓
 读取真实项目代码
  ↓
@@ -93,10 +89,11 @@ AI-Development-Agency/
 ├── artifacts/                # 标准研发产物
 ├── validation/               # 验证与质量检查（scripts/validate.sh 门禁）
 ├── evolution/                # 规则自进化（feedback / proposals / archive / metrics）
-├── skills/                   # 场景技能层（debt / diff-review / task-audit / agency-task / agency-feedback）
+├── routes/                   # 任务/文件 → 规范 的单一路由表
+├── skills/                   # 场景技能层（agency-route 在写代码时自动匹配）
 ├── scripts/                  # 工具链：agency CLI + 初始化 / 校验 / 进化脚本
 ├── templates/                # 项目 AGENTS.md / 提案等模板
-├── docs/                     # 使用手册、批量初始化、团队推广方案、载体归属迁移清单
+├── docs/                     # 使用手册、规则清单、批量初始化、团队推广方案、载体归属迁移清单
 ├── CHANGELOG.md              # 规则版本变更记录
 └── .github/                  # CI（validate.yml 规范守门）
 ```
@@ -110,14 +107,19 @@ AI-Development-Agency/
 # 2) 把本规范接入你的项目（.ai/agency 软链接 + 项目 AGENTS.md，已有不覆盖）
 agency init ~/workspace/你的项目
 
-# 3) 开工：组装一个 Agent 的使用块（角色 + 必读规则 + 建议流程）
-agency use java-developer
+# 3) 接入时写入「提示词自动路由」（AGENTS.md 段 + Cursor 规则 + 技能，均可提交）
+#    之后直接对 AI 下任务即可，不必先记 agency use / agency route
+agency init ~/workspace/你的项目
 
-# 4) 收工：记录规则使用反馈（自进化的起点）
+# 4) 可选：检查这次任务会命中哪些摘要
+agency route --task "给审核加一个查询接口" --files Foo.java
+
+# 5) 收工：记录规则使用反馈（自进化的起点）
 agency feedback --kind rule_gap --detail "遇到的问题"
 ```
 
 > 完整日常用法见 `docs/日常使用手册.md`；校验规范库用 `agency validate`。
+> 当前有哪些硬规则、想删哪些，见 `docs/规则清单.md`。
 
 ## 5. 当前覆盖的角色
 
@@ -182,6 +184,7 @@ agency feedback --kind rule_gap --detail "遇到的问题"
 
 通过 `adapters/` 提供接入说明，目前包括：
 
+- **Cursor**
 - **Codex**
 - **Reasonix**
 - **DeepSeek Harness**
@@ -191,13 +194,13 @@ agency feedback --kind rule_gap --detail "遇到的问题"
 ```text
                  AI Development Agency
                            │
-          ┌────────────────┼────────────────┐
-          ↓                ↓                ↓
-       Codex            Reasonix      DeepSeek Harness
-          │                │                │
-          └────────────────┼────────────────┘
+     ┌──────────┬──────────┼──────────┬──────────┐
+     ↓          ↓          ↓          ↓          ↓
+  Cursor     Codex     Reasonix  DeepSeek    其它读
+     │          │          │      Harness   AGENTS.md
+     └──────────┴──────────┴──────────┴──────────┘
                            ↓
-                  读取同一套 Agent / Rule
+                  同一张 routes/table.tsv
 ```
 
 **工具是运行层，Agency 是规范层。**
@@ -280,34 +283,14 @@ agency feedback --kind rule_gap --detail "遇到的问题"
 
 > 给现有 Java 医保审核系统增加一个规则查询接口。
 
-执行思路：
+用户**直接说这句话**。不要先输入 `agency use`。
 
-```text
-1. 读取项目 AGENTS.md
-        ↓
-2. 读取 Agency 总控规则
-        ↓
-3. 判断任务等级
-        ↓
-4. 选择 Java Developer
-        ↓
-5. 选择 Medical Insurance Reviewer（需要时）
-        ↓
-6. 加载 Java / SQL Server Rule
-        ↓
-7. 选择 Feature Development Workflow
-        ↓
-8. 阅读 Controller / Service / Repository / SQL
-        ↓
-9. 实现
-        ↓
-10. 测试
-        ↓
-11. Code Review / QA
-        ↓
-12. 汇报修改、验证和风险
-        ↓
-13. 记录规则反馈 / 创建提案（自进化）
+工具自动：读项目 `AGENTS.md` 路由段 → 命中 Java + 医保摘要 → 再读代码 → 实现。
+
+若要人工核对命中了什么：
+
+```bash
+agency route --task "给现有 Java 医保审核系统增加一个规则查询接口" --files Foo.java
 ```
 
 对于简单任务，不需要强行加载所有 Agent。
@@ -479,7 +462,7 @@ agency-curator 评审合并（evolution-review workflow）
 
 ```bash
 mkdir -p ~/.agents/skills
-for s in debt diff-review task-audit agency-task agency-feedback; do
+for s in debt diff-review task-audit agency-task agency-feedback agency-route; do
   ln -sfn ~/workspace/AI-Development-Agency/skills/$s ~/.agents/skills/$s
 done
 ```

@@ -2,6 +2,19 @@
 
 所有规则/规范变更记录于此。版本语义见 `rules/evolution.md`（MAJOR=破坏性，MINOR=新增，PATCH=澄清/修正）。
 
+## v1.5.0（2026-09-03）
+
+**规范自动路由：提示词触发，注入规则摘要（MINOR）**
+
+- 新增 `routes/table.tsv`：任务/文件 → Agent / Rule / Workflow 的单一真相。
+- 各业务规则增加 `## 摘要（注入用）`；默认往上下文塞摘要而不是全文。
+- 新增 `agency route`：可选检查器；`--install` 把路由段写入业务仓库（`AGENTS.md` / `.cursor/rules/agency-router.mdc` / `.agents/skills/agency-route`，可提交）；`--refresh-docs` 刷新本仓库文档。
+- 新增技能 `agency-route`：写代码任务按 description 自动匹配，不要求用户先跑 CLI。
+- `agency init` 接入项目时自动 `--install` 路由。
+- 新增 `docs/规则清单.md`：摊开现行条文供圈选留/删。
+- 新增 `adapters/cursor.md`。`rules/java.md` 去掉写死的 `JavertConstants`，改为以项目 `AGENTS.md` 为准。
+- 总控升级 v1.5.0。
+
 ## v1.4.1（2026-08-31）
 
 **修复项目接入软链接指向错误（PATCH）**

@@ -1,0 +1,25 @@
+# Agency 规范路由表（单一真相）
+# 格式: type|id|pattern|agents|rules|workflow|risk|stack|hint
+# type: always=每次注入; file=匹配路径; keyword=匹配任务文本
+# pattern: file 为逗号分隔 glob（对路径或 basename）；keyword 为逗号分隔子串（大小写不敏感）
+# agents/rules: 逗号分隔；rules 为规范库相对路径。空字段允许。
+# workflow: 单个路径；多条冲突时升到 workflows/feature-development.md
+# risk: L1/L2/L3，输出取匹配中最高
+# stack: java|vue|react|python|sqlserver|ai|healthcare|any；install 按项目裁剪摘要
+# hint: 摘要读不到时的一行压缩，禁止含竖线 |
+#
+always|core|||rules/global.md,rules/minimalism.md,rules/security.md|||any|先理解再改；最小变更；简化留痕；密钥不进代码；输入不可信；SQL 参数化
+file|java|*.java,*.kt|java-developer|rules/java.md|workflows/backend-development.md|L2|java|Controller 收完整 DTO；禁业务 PathVariable；禁 Map；禁魔法值
+file|spring-boot|application*.yml,application*.yaml,application*.properties,*ConfigurationProperties.java|java-developer|rules/backend/java/spring-boot-configuration.md|workflows/backend-development.md|L2|java|YAML kebab-case；禁 Secret 进 Git；Duration；Mock 默认关闭
+file|vue|*.vue|vue-developer|rules/vue.md|workflows/frontend-development.md|L2|vue|Vue3 script setup；禁 any；异步四态；复用项目已有组件
+file|react|*.tsx,*.jsx|react-developer|rules/react.md|workflows/frontend-development.md|L2|react|TypeScript；明确类型；复用既有状态管理与组件库
+file|python|*.py|python-developer|rules/python.md|workflows/backend-development.md|L2|python|类型明确；密钥不写死；外部调用要超时重试
+file|sql|*.sql,*Mapper.xml,*mapper.xml|sqlserver-dba|rules/sqlserver.md|workflows/database-change.md|L2|sqlserver|禁 SELECT *；参数化 SQL；迁移要锁/回滚/兼容说明
+keyword|java-task|spring boot,springboot,mybatis,controller,dto|java-developer|rules/java.md|workflows/backend-development.md|L2|java|Controller 收完整 DTO；禁业务 PathVariable；禁 Map；禁魔法值
+keyword|vue-task|vue,pinia,element plus,script setup|vue-developer|rules/vue.md|workflows/frontend-development.md|L2|vue|Vue3 script setup；禁 any；异步四态
+keyword|react-task|react,hooks,tsx|react-developer|rules/react.md|workflows/frontend-development.md|L2|react|TypeScript；明确类型；复用既有方案
+keyword|python-task|python,fastapi,django,pytest|python-developer|rules/python.md|workflows/backend-development.md|L2|python|类型明确；密钥不写死；外部调用要超时重试
+keyword|sql-task|sql server,sqlserver,t-sql,tsql,存储过程,执行计划,query store|sqlserver-dba|rules/sqlserver.md|workflows/database-change.md|L3|sqlserver|禁 SELECT *；参数化；迁移要锁/回滚/兼容
+keyword|ai-task|RAG,OCR,embedding,LLM,prompt,向量检索,重排序|ai-engineer,rag-engineer|rules/ai.md|workflows/ai-feature-development.md|L2|ai|模型输出不是事实；医疗 AI 不得覆盖确定性规则
+keyword|healthcare|医保,DRG,DIP,病组,病案,审核规则,医疗数据,患者,诊疗|medical-insurance-reviewer,healthcare-domain-expert|rules/healthcare.md|workflows/feature-development.md|L3|healthcare|规则可追溯；区分命中/无法判断；AI 建议不等于审核结论；日志禁敏感字段
+keyword|bug|bug,修复,报错,回归,npe,exception|||workflows/bug-fixing.md|L1|any|修根因；grep 所有调用方

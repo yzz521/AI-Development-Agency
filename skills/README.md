@@ -41,6 +41,7 @@ description: 一句话说明「做什么 + 什么时候用」，把触发词嵌�
 
 | 技能 | 场景 | 过程 |
 | --- | --- | --- |
+| `skills/agency-route/SKILL.md` | 写代码 / 改接口 / 改页面 | 读路由表，注入命中规则的摘要；**不要求用户跑 CLI** |
 | `skills/debt/SKILL.md` | 收割债务 / 清单简化的债 | 跑 `agency debt` 输出台账 |
 | `skills/task-audit/SKILL.md` | 查 AI 是否真实执行 / 审计任务单 | 跑 `agency audit` + 解读 |
 | `skills/diff-review/SKILL.md` | review 改动 / 查过度设计 | 只审 diff 的过度设计 |
@@ -51,7 +52,8 @@ description: 一句话说明「做什么 + 什么时候用」，把触发词嵌�
 
 - 遵循"一个提案一件事"：新增技能走 `agency propose`（type `other`）。
 - 技能必须自包含 frontmatter + 触发 / 边界 / 退出，否则不合并。
-- 技能只包装**已存在**的命令；命令还没实现就先别建技能（避免技能指向不存在的脚本）。
+- 技能可以包装已有命令；**跨工具自动触发的技能必须在没有 CLI 时仍能靠读文件完成**（见 `agency-route`）。
+- 技能必须自包含 frontmatter + 触发 / 边界 / 退出，否则不合并。
 
 ## 不该做成技能的东西
 

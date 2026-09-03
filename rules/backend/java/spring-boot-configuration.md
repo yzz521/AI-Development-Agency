@@ -2,6 +2,14 @@
 
 > 适用于 Java / Spring Boot 项目的 `application.yml`、`application.yaml`、`application-*.yml`、`application-*.yaml` 以及 `@ConfigurationProperties` 配置类。
 
+## 摘要（注入用）
+
+- YAML 用 kebab-case，Java 字段 camelCase；优先 `@ConfigurationProperties`，禁止业务代码大量 `@Value`。
+- Secret / Token / 密码禁止进 Git，用环境变量，敏感默认值必须为空。
+- 时间用 `Duration`（`5s` / `60s`），禁止魔法毫秒数。
+- Mock 与高风险功能默认关闭，生产不得靠默认值进入 Mock。
+- 配置按业务域拆分，禁止巨型 `CustomProperties`；改配置先搜引用和环境，最小修改。
+
 ---
 
 ## 1. 规范目标

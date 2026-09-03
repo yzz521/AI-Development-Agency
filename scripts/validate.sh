@@ -37,7 +37,7 @@ ref_ok() {
 echo "== 校验规范库：$AGENCY_ROOT =="
 
 # 1. 结构完整性
-for d in agents rules workflows context contracts artifacts validation evolution templates scripts; do
+for d in agents rules workflows context contracts artifacts validation evolution templates scripts routes skills; do
   [ -d "$d" ] && ok "目录 $d/" || fail "缺少目录 $d/"
 done
 [ -f AGENTS.md ] && ok "AGENTS.md" || fail "缺少 AGENTS.md"
@@ -129,6 +129,61 @@ else
   ok "暂无反馈记录"
 fi
 [ "$fb_bad" -eq 0 ] && ok "反馈 kind 全部合法"
+
+# 9. 路由表
+echo "── 规范路由 ──"
+if [ -f routes/table.tsv ]; then
+  ok "routes/table.tsv"
+else
+  fail "缺少 routes/table.tsv"
+fi
+grep -q 'agency-router:begin' AGENTS.md && ok "AGENTS.md 含路由段标记" || fail "AGENTS.md 缺 agency-router 标记"
+[ -f skills/agency-route/SKILL.md ] && ok "skills/agency-route" || fail "缺少 agency-route 技能"
+[ -f contracts/route-contract.md ] && ok "contracts/route-contract.md" || fail "缺少路由契约"
+
+route_bad=0
+while IFS= read -r line || [ -n "$line" ]; do
+  case "$line" in \#*|"") continue;; esac
+  IFS='|' read -r type id pattern agents rules wf risk st hint <<EOF
+$line
+EOF
+  [ -n "$id" ] || { fail "路由表空 id: $line"; route_bad=$((route_bad+1)); continue; }
+  case "$type" in always|file|keyword) ;; *) fail "路由表非法 type: $type ($id)"; route_bad=$((route_bad+1));; esac
+  rest="${rules},"
+  while [ -n "$rest" ]; do
+    ref="${rest%%,*}"; rest="${rest#*,}"
+    ref="$(printf '%s' "$ref" | sed 's/^ *//;s/ *$//')"
+    [ -z "$ref" ] && continue
+    [ -f "$ref" ] || { fail "路由表 $id 引用缺失: $ref"; route_bad=$((route_bad+1)); }
+  done
+  rest="${agents},"
+  while [ -n "$rest" ]; do
+    ag="${rest%%,*}"; rest="${rest#*,}"
+    ag="$(printf '%s' "$ag" | sed 's/^ *//;s/ *$//')"
+    [ -z "$ag" ] && continue
+    find agents -name "$ag.md" | grep -q . || { fail "路由表 $id Agent 不存在: $ag"; route_bad=$((route_bad+1)); }
+  done
+  if [ -n "$wf" ] && [ ! -f "$wf" ]; then
+    fail "路由表 $id workflow 缺失: $wf"; route_bad=$((route_bad+1))
+  fi
+done < routes/table.tsv
+[ "$route_bad" -eq 0 ] && ok "路由表引用全部可解析"
+
+# 10. 被路由规则必须有摘要区（evolution.md 除外）
+sum_bad=0
+while IFS= read -r f; do
+  case "$f" in rules/evolution.md) continue;; esac
+  grep -q '^## 摘要（注入用）$' "$f" || { fail "$f 缺少 ## 摘要（注入用）"; sum_bad=$((sum_bad+1)); }
+done < <(find rules -name '*.md')
+[ "$sum_bad" -eq 0 ] && ok "被分发规则均含摘要区"
+
+# 11. 路由自测
+if bash scripts/route-selftest.sh >/tmp/agency-route-selftest.log 2>&1; then
+  ok "route-selftest"
+else
+  fail "route-selftest 失败（见 /tmp/agency-route-selftest.log）"
+  cat /tmp/agency-route-selftest.log >&2 || true
+fi
 
 echo
 echo "PASS=$PASS WARN=$WARN FAIL=$FAIL"

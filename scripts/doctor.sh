@@ -5,7 +5,14 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; AGENCY_ROOT="$(cd "$
 PROJECT_DIR="$(cd "$PROJECT_DIR" 2>/dev/null && pwd)" || { echo "错误：项目不存在"; exit 1; }
 LINK="$PROJECT_DIR/.ai/agency"; PASS=0; WARN=0; FAIL=0
 ok(){ echo "✓ $1"; PASS=$((PASS+1)); }; warn(){ echo "⚠ $1"; WARN=$((WARN+1)); }; fail(){ echo "✗ $1"; FAIL=$((FAIL+1)); }
-[ -f "$PROJECT_DIR/AGENTS.md" ] && ok "AGENTS.md" || fail "缺少 AGENTS.md"
+if [ -f "$PROJECT_DIR/AGENTS.md" ]; then
+  ok "AGENTS.md"
+  grep -q 'agency-router:begin' "$PROJECT_DIR/AGENTS.md" && ok "AGENTS.md 含规范路由段" || warn "AGENTS.md 无规范路由段（agency route --install 可写入）"
+else
+  fail "缺少 AGENTS.md"
+fi
+[ -f "$PROJECT_DIR/.cursor/rules/agency-router.mdc" ] && ok "Cursor 自动路由规则" || warn "无 .cursor/rules/agency-router.mdc（仅 Cursor 增益）"
+[ -f "$PROJECT_DIR/.agents/skills/agency-route/SKILL.md" ] && ok "agency-route 技能" || warn "无 .agents/skills/agency-route（技能自动匹配不可用）"
 if [ -L "$LINK" ]; then
   resolved="$(cd "$(dirname "$LINK")" && cd "$(readlink "$LINK")" 2>/dev/null && pwd || true)"
   [ "$resolved" = "$AGENCY_ROOT" ] && ok ".ai/agency 正确" || fail ".ai/agency 指向错误"
