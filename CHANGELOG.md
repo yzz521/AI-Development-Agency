@@ -2,6 +2,17 @@
 
 所有规则/规范变更记录于此。版本语义见 `rules/evolution.md`（MAJOR=破坏性，MINOR=新增，PATCH=澄清/修正）。
 
+## v1.5.1（2026-09-03）
+
+**按规则清单落地红线 / 条件加载 / 下沉（PATCH）**
+
+- 用户确认 `docs/规则清单.md` 建议列可直接用。
+- 常驻红线收束到 global / minimalism / security 摘要 + 总控 §8 条；Map、魔法值、Java 版本、Pinia、Ant Design、医疗口径改为条件加载或下沉项目。
+- 删除 Vue「蓝紫渐变」；Java 23 改为以项目为准；Spring Boot 示例前缀 `javert` → `app`。
+- 性能优化拆到 `rules/performance.md` 条件加载；安全分级不再塞进写代码常驻摘要。
+- 全部开发角色必读改为项目 `AGENTS.md`，不再指向中央 `context/`。
+- B8 与最终汇报并存：未要求讲解时简短，规范汇报仍须完整。
+
 ## v1.5.0（2026-09-03）
 
 **规范自动路由：提示词触发，注入规则摘要（MINOR）**

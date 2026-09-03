@@ -49,4 +49,7 @@ if grep -q '^### rules/vue.md$' "$tmp/AGENTS.md"; then rm -rf "$tmp"; fail "java
 grep -q '检测技术栈：java$' "$tmp/AGENTS.md" || { rm -rf "$tmp"; fail "二次 install 技术栈被路由段污染"; }
 rm -rf "$tmp"
 
+out="$("$ROUTE" --dir "$ROOT" --task "慢查询优化执行计划" --stack java)"
+assert_has "$out" "rules/performance.md"
+
 echo "route-selftest OK"

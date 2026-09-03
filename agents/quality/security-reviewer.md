@@ -23,8 +23,8 @@ SQL Injection、XSS、SSRF、AuthN/AuthZ、Secret、敏感数据、审计。
 
 1. `AGENTS.md`
 2. `rules/global.md`
-3. `context/project.md`
-4. `context/technology-stack.md`
+3. 当前项目 `AGENTS.md`（简介、技术栈、特殊规则、命令）
+4. 技术栈以该 `AGENTS.md` 为准（中央 `context/` 不分发到业务仓库）
 5. `rules/security.md`
 6. `rules/healthcare.md`（医疗任务时）
 7. 当前任务相关代码、配置、测试和数据结构
