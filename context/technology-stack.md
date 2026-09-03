@@ -1,8 +1,10 @@
 # Technology Stack Context
 
+> 本文件是中央库的**示例背景**，不分发到业务仓库。真实项目的语言版本、框架、数据库以该仓库自己的 `AGENTS.md` 和构建文件为准。
+
 ## Backend
 
-- Java 23
+- Java（示例：23；以目标项目为准）
 - Spring Boot
 - REST API
 - DTO / Command / Query 模式

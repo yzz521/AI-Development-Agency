@@ -2,6 +2,49 @@
 
 所有规则/规范变更记录于此。版本语义见 `rules/evolution.md`（MAJOR=破坏性，MINOR=新增，PATCH=澄清/修正）。
 
+## v1.6.0（2026-09-03）
+
+**增量规范门禁：只卡 diff，不卡存量（MINOR）**
+
+- 新增 `agency check`：按 `checks/catalog.tsv` 扫描 **git diff 新增行**。默认只开 `java-map-object` / `sql-select-star` / `secret-hardcoded`。
+- `--staged` 给 pre-commit，`--base` 给 CI，`--all` 只做存量台账。
+- `--install` 写入可提交的 `.agency-check/`、`.githooks/pre-commit`、`.github/workflows/agency-check.yml`、`agency-check.conf`；**不绑进** `agency init`。
+- **破坏性别名**：`agency check` 不再等于 `agency status`/`doctor`。接入体检请用 `agency status` 或 `agency doctor`。
+- 不做机检：魔法值、DTO 语义、医疗口径；Javert 专有规则不进中央默认 on。
+- 技能 `agency-check`；契约 `contracts/check-contract.md`。
+
+## v1.5.2（2026-09-03）
+
+**路由回执：让「有没有触发」看得见（PATCH）**
+
+- 写代码回复第一行必须是 `agency-route: matched=... risk=... rules=... source=...`。
+- `agency route` CLI 输出同样一行；任务单增加「规范路由回执」；`agency audit` 缺回执则 WARN。
+- 手册新增「怎么知道规范有没有被用到」：区分进上下文 / 模型声称匹配 / 代码是否守规。探测口令：`只做路由探测，不要改代码`。
+
+## v1.5.1（2026-09-03）
+
+**按规则清单落地红线 / 条件加载 / 下沉（PATCH）**
+
+- 用户确认 `docs/规则清单.md` 建议列可直接用。
+- 常驻红线收束到 global / minimalism / security 摘要 + 总控 §8 条；Map、魔法值、Java 版本、Pinia、Ant Design、医疗口径改为条件加载或下沉项目。
+- 删除 Vue「蓝紫渐变」；Java 23 改为以项目为准；Spring Boot 示例前缀 `javert` → `app`。
+- 性能优化拆到 `rules/performance.md` 条件加载；安全分级不再塞进写代码常驻摘要。
+- 全部开发角色必读改为项目 `AGENTS.md`，不再指向中央 `context/`。
+- B8 与最终汇报并存：未要求讲解时简短，规范汇报仍须完整。
+
+## v1.5.0（2026-09-03）
+
+**规范自动路由：提示词触发，注入规则摘要（MINOR）**
+
+- 新增 `routes/table.tsv`：任务/文件 → Agent / Rule / Workflow 的单一真相。
+- 各业务规则增加 `## 摘要（注入用）`；默认往上下文塞摘要而不是全文。
+- 新增 `agency route`：可选检查器；`--install` 把路由段写入业务仓库（`AGENTS.md` / `.cursor/rules/agency-router.mdc` / `.agents/skills/agency-route`，可提交）；`--refresh-docs` 刷新本仓库文档。
+- 新增技能 `agency-route`：写代码任务按 description 自动匹配，不要求用户先跑 CLI。
+- `agency init` 接入项目时自动 `--install` 路由。
+- 新增 `docs/规则清单.md`：摊开现行条文供圈选留/删。
+- 新增 `adapters/cursor.md`。`rules/java.md` 去掉写死的 `JavertConstants`，改为以项目 `AGENTS.md` 为准。
+- 总控升级 v1.5.0。
+
 ## v1.4.1（2026-08-31）
 
 **修复项目接入软链接指向错误（PATCH）**

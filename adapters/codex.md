@@ -48,20 +48,12 @@ your-project/
 
 ## 4. 推荐启动方式
 
-进入项目：
+进入项目后直接下任务。Codex 会读根目录 `AGENTS.md` 里的规范路由段。
+
+不要要求用户先执行 `agency use`。需要核对命中结果时才用：
 
 ```bash
-cd /path/to/your-project
-codex
-```
-
-开始任务时可以直接：
-
-```text
-先读取项目根目录 AGENTS.md。
-根据任务类型选择 AI Development Agency 中最小必要的 Agent 和 Rule。
-先阅读现有代码，再修改。
-完成后运行项目要求的验证。
+agency route --task "新增医保审核规则配置的查询接口"
 ```
 
 ## 5. Java 任务示例

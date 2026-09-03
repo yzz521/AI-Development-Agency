@@ -23,8 +23,8 @@ LLM API、结构化输出、Tool Calling、Agent、评测、成本、延迟、Fa
 
 1. `AGENTS.md`
 2. `rules/global.md`
-3. `context/project.md`
-4. `context/technology-stack.md`
+3. 当前项目 `AGENTS.md`（简介、技术栈、特殊规则、命令）
+4. 技术栈以该 `AGENTS.md` 为准（中央 `context/` 不分发到业务仓库）
 5. `rules/ai.md`
 6. 当前任务相关代码、配置、测试和数据结构
 

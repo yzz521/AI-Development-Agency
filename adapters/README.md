@@ -4,6 +4,7 @@
 
 当前支持：
 
+- Cursor
 - Codex
 - Reasonix
 - DeepSeek Harness
@@ -21,9 +22,9 @@ AI Development Agency
         └── context/
                 │
                 ↓
-        ┌───────┼────────┐
-        ↓       ↓        ↓
-      Codex  Reasonix  DeepSeek Harness
+        ┌───────┬────────┼────────┐
+        ↓       ↓        ↓        ↓
+     Cursor  Codex   Reasonix  DeepSeek Harness
 ```
 
 工具只是“运行层 / 使用层”。
