@@ -1,7 +1,7 @@
 # AI Development Agency
 
 > 面向企业软件研发的 AI 虚拟研发团队规范库。  
-> 当前版本：**v1.6.0**
+> 当前版本：**v1.7.0**
 
 AI Development Agency 不是新的 AI Coding Runtime，也不是把多个 Agent 强行绑定在一起的框架。
 
@@ -91,7 +91,7 @@ AI-Development-Agency/
 ├── evolution/                # 规则自进化（feedback / proposals / archive / metrics）
 ├── routes/                   # 任务/文件 → 规范 的单一路由表
 ├── checks/                   # 增量门禁规则表（catalog.tsv）
-├── skills/                   # 场景技能层（agency-route / agency-check）
+├── skills/                   # 场景技能层（agency-route / agency-check / git-commit）
 ├── scripts/                  # 工具链：agency CLI + 初始化 / 校验 / 进化脚本
 ├── templates/                # 项目 AGENTS.md / hook / CI / 提案等模板
 ├── docs/                     # 使用手册、规则清单、批量初始化、团队推广方案、载体归属迁移清单
@@ -464,7 +464,7 @@ agency-curator 评审合并（evolution-review workflow）
 
 ```bash
 mkdir -p ~/.agents/skills
-for s in debt diff-review task-audit agency-task agency-feedback agency-route agency-check; do
+for s in debt diff-review task-audit agency-task agency-feedback agency-route agency-check git-commit; do
   ln -sfn ~/workspace/AI-Development-Agency/skills/$s ~/.agents/skills/$s
 done
 ```

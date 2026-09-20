@@ -564,9 +564,12 @@ cmd_install() {
   rm -rf "$dir/.agents/skills/agency-route"
   cp -R "$AGENCY_ROOT/skills/agency-route" "$dir/.agents/skills/agency-route"
   echo "✓ 写入 $dir/.agents/skills/agency-route/"
+  rm -rf "$dir/.agents/skills/git-commit"
+  cp -R "$AGENCY_ROOT/skills/git-commit" "$dir/.agents/skills/git-commit"
+  echo "✓ 写入 $dir/.agents/skills/git-commit/"
 
   rm -f "$snippet"
-  echo "完成：提示词自动路由已写入项目（可提交 AGENTS.md / .cursor/rules / .agents/skills）"
+  echo "完成：提示词自动路由已写入项目（可提交 AGENTS.md / .cursor/rules / .agents/skills/agency-route / .agents/skills/git-commit）"
   echo "技术栈: ${stack:-未检测，已写入全量摘要}"
 }
 

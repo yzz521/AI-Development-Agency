@@ -1,4 +1,4 @@
-# AI Development Agency — 总控规则 v1.6.0
+# AI Development Agency — 总控规则 v1.7.0
 
 ## 1. 项目定位
 
@@ -143,6 +143,7 @@
 | `性能,慢查询,吞吐,执行计划,profiler,优化延迟` | `rules/performance.md` | `sqlserver-performance` | - |
 | `安全审查,漏洞,cve,blocker` | `rules/security.md` | `security-reviewer` | - |
 | `bug,修复,报错,回归,npe,exception` | — | — | L1 |
+| `git,commit,分支,pull request,约定式提交,conventional commit,hotfix,语义化版本,commitlint,提交信息,直推 main` | `rules/git.md` | — | L1 |
 
 ### 本项目应注入的摘要
 
@@ -247,6 +248,15 @@
 
 原文路径：`rules/performance.md`（项目内通常是 `.ai/agency/rules/performance.md`）
 
+### rules/git.md
+- 提交信息用 Conventional Commits：`type(scope): 摘要`。常用 type：`feat` `fix` `docs` `style` `refactor` `perf` `test` `chore` `revert`。
+- 功能与修复在独立短生命周期分支上做，经 PR 合入受保护主干；禁止直推 `main`/`master`。
+- 分支名：`feature|fix|hotfix|release|chore|docs/<语义化描述>`，禁止 `aaa`/`test`/`111`。
+- 发布 tag 用带注释的 SemVer：`vX.Y.Z`。密钥不进提交（见 `rules/security.md`）。
+- 分支策略由项目 `AGENTS.md` 声明；未声明时默认 GitHub Flow（`main` + 短分支 + PR）。
+
+原文路径：`rules/git.md`（项目内通常是 `.ai/agency/rules/git.md`）
+
 ### 仍不要做的事
 
 - 不要为了「走完流程」加载全部 Agent Prompt。
@@ -295,8 +305,9 @@
 6. 有意简化必须 `agency: <上限>, <升级路径>` 留痕。
 7. 完成后说明改了什么、为什么、怎么验证、还有什么风险。规范要求的汇报完整写出。
 8. 规范库自身的任务必须按 `rules/evolution.md` 记录反馈；发现缺口必须提案。业务仓库建议记录，不强制每次。
+9. 提交信息用 Conventional Commits（`type(scope): 摘要`）；功能与修复走独立分支和 PR，禁止直推 `main`/`master`。细则见 `rules/git.md`。
 
-Map / 魔法值 / 业务 PathVariable 等见 Java 条件加载摘要。数据库迁移见 SQL 摘要。医疗口径见医疗摘要。
+Map / 魔法值 / 业务 PathVariable 等见 Java 条件加载摘要。数据库迁移见 SQL 摘要。医疗口径见医疗摘要。Git 细则按任务关键词加载 `rules/git.md`。
 
 ## 7. 最终汇报
 

@@ -1,0 +1,34 @@
+#!/bin/sh
+# Agency commit-msg：校验 Conventional Commits。
+# 本文件可提交。随 agency check --install 写入 .githooks/commit-msg。
+# 每个 clone 需要一次：git config core.hooksPath .githooks
+# 若使用 husky，把本脚本调用并进 .husky/commit-msg，不要改 core.hooksPath。
+set -e
+MSG_FILE="${1:-}"
+[ -n "$MSG_FILE" ] && [ -f "$MSG_FILE" ] || exit 0
+
+header="$(tr -d '\r' < "$MSG_FILE" | grep -v '^#' | sed '/^$/d' | head -1)"
+[ -z "$header" ] && exit 0
+
+case "$header" in
+  Merge\ *|Revert\ *|fixup!\ *|squash!\ *) exit 0 ;;
+esac
+
+if ! printf '%s' "$header" | grep -Eq '^(feat|fix|docs|style|refactor|perf|test|chore|revert|build|ci)(\([a-zA-Z0-9._/-]+\))?(!)?: [^[:space:]].+'; then
+  echo "❌ 提交信息不符合 Conventional Commits：" >&2
+  echo "   $header" >&2
+  echo "   格式: type(scope): 摘要" >&2
+  echo "   type: feat fix docs style refactor perf test chore revert build ci" >&2
+  echo "   详见 rules/git.md" >&2
+  exit 1
+fi
+
+len="$(printf '%s' "$header" | wc -c)"
+len="$(printf '%s' "$len" | tr -d ' ')"
+if [ "$len" -gt 200 ]; then
+  echo "❌ 提交标题过长（${len} 字节，建议一行说清）" >&2
+  echo "   详见 rules/git.md" >&2
+  exit 1
+fi
+
+exit 0

@@ -25,3 +25,4 @@ keyword|healthcare|医保,DRG,DIP,病组,病案,审核规则,医疗数据,患者
 keyword|perf|性能,慢查询,吞吐,执行计划,profiler,优化延迟|sqlserver-performance|rules/performance.md|||any|先测量再改；禁止凭感觉优化
 keyword|sec-review|安全审查,漏洞,cve,blocker|security-reviewer|rules/security.md|||any|安全问题按 Blocker/High/Medium/Low 分级
 keyword|bug|bug,修复,报错,回归,npe,exception|||workflows/bug-fixing.md|L1|any|修根因；grep 所有调用方
+keyword|git|git,commit,分支,pull request,约定式提交,conventional commit,hotfix,语义化版本,commitlint,提交信息,直推 main||rules/git.md||L1|any|约定式提交；独立分支+PR；禁直推主干；模型以项目 AGENTS.md 为准

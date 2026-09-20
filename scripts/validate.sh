@@ -139,6 +139,8 @@ else
 fi
 grep -q 'agency-router:begin' AGENTS.md && ok "AGENTS.md 含路由段标记" || fail "AGENTS.md 缺 agency-router 标记"
 [ -f skills/agency-route/SKILL.md ] && ok "skills/agency-route" || fail "缺少 agency-route 技能"
+[ -f skills/git-commit/SKILL.md ] && ok "skills/git-commit" || fail "缺少 git-commit 技能"
+grep -q '^name: git-commit$' skills/git-commit/SKILL.md && ok "git-commit frontmatter" || fail "git-commit 缺 name frontmatter"
 [ -f contracts/route-contract.md ] && ok "contracts/route-contract.md" || fail "缺少路由契约"
 
 route_bad=0
@@ -192,6 +194,7 @@ echo "── 增量门禁 ──"
 [ -f contracts/check-contract.md ] && ok "contracts/check-contract.md" || fail "缺少门禁契约"
 [ -f skills/agency-check/SKILL.md ] && ok "skills/agency-check" || fail "缺少 agency-check 技能"
 [ -f templates/githooks/pre-commit ] && ok "templates/githooks/pre-commit" || fail "缺少 hook 模板"
+[ -f templates/githooks/commit-msg ] && ok "templates/githooks/commit-msg" || fail "缺少 commit-msg 钩子模板"
 [ -f templates/github-workflows/agency-check.yml ] && ok "templates/github-workflows/agency-check.yml" || fail "缺少 CI 模板"
 [ -f templates/agency-check.conf ] && ok "templates/agency-check.conf" || fail "缺少 agency-check.conf 模板"
 grep -q '^name: agency-check$' skills/agency-check/SKILL.md && ok "agency-check frontmatter" || fail "agency-check 缺 name frontmatter"
@@ -214,6 +217,13 @@ if bash scripts/check-selftest.sh >/tmp/agency-check-selftest.log 2>&1; then
 else
   fail "check-selftest 失败（见 /tmp/agency-check-selftest.log）"
   cat /tmp/agency-check-selftest.log >&2 || true
+fi
+
+if bash scripts/git-hook-selftest.sh >/tmp/agency-git-hook-selftest.log 2>&1; then
+  ok "git-hook-selftest"
+else
+  fail "git-hook-selftest 失败（见 /tmp/agency-git-hook-selftest.log）"
+  cat /tmp/agency-git-hook-selftest.log >&2 || true
 fi
 
 echo

@@ -68,3 +68,4 @@ Check all upstream outputs and acceptance criteria.
 - 无 BLOCKER
 - 风险明确
 - 有回滚方案（需要时）
+- 变更在独立分支，提交信息符合 `rules/git.md`，经 PR 合入主干
