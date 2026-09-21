@@ -71,7 +71,8 @@ agency check --list [dir]          # 列出检查项及当前开关
 | --- | --- |
 | `agency-check.conf` | 开关与 CI base |
 | `.agency-check/check.sh` + `catalog.tsv` | 不依赖软链接也能跑 |
-| `.githooks/pre-commit` | 本机拦截；需 `git config core.hooksPath .githooks` |
+| `.githooks/pre-commit` | 本机拦截增量代码；需 `git config core.hooksPath .githooks` |
+| `.githooks/commit-msg` | 本机拦截提交文案（Conventional Commits，见 `rules/git.md`） |
 | `.github/workflows/agency-check.yml` | PR/push 强制 |
 | `.agents/skills/agency-check/` | 技能提示，**无强制力** |
 

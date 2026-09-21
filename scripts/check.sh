@@ -426,6 +426,9 @@ cmd_install() {
   cp "$AGENCY_ROOT/templates/githooks/pre-commit" "$dir/.githooks/pre-commit"
   chmod +x "$dir/.githooks/pre-commit"
   echo "✓ 写入 $dir/.githooks/pre-commit"
+  cp "$AGENCY_ROOT/templates/githooks/commit-msg" "$dir/.githooks/commit-msg"
+  chmod +x "$dir/.githooks/commit-msg"
+  echo "✓ 写入 $dir/.githooks/commit-msg"
 
   if [ -f "$dir/agency-check.conf" ] && [ "$FORCE" != "1" ]; then
     echo "✓ 保留已有 $dir/agency-check.conf"
@@ -446,8 +449,8 @@ cmd_install() {
   echo "✓ 写入 $dir/.agents/skills/agency-check/"
 
   if [ -d "$dir/.git" ] || git -C "$dir" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-    if [ -f "$dir/.husky/pre-commit" ]; then
-      echo "⚠ 检测到 husky，未设置 core.hooksPath。请把 .githooks/pre-commit 中的调用并进 .husky/pre-commit。"
+    if [ -f "$dir/.husky/pre-commit" ] || [ -f "$dir/.husky/commit-msg" ]; then
+      echo "⚠ 检测到 husky，未设置 core.hooksPath。请把 .githooks/pre-commit 与 .githooks/commit-msg 中的调用并进对应 husky 钩子。"
     else
       git -C "$dir" config core.hooksPath .githooks
       echo "✓ 本 clone 已 git config core.hooksPath .githooks"

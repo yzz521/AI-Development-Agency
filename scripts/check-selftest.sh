@@ -111,6 +111,7 @@ git -C "$proj" commit -q -m init
 "$CHECK" --install "$proj" >/tmp/agency-check-out.txt
 [ -f "$proj/.agency-check/check.sh" ] || fail "missing vendored check.sh"
 [ -f "$proj/.githooks/pre-commit" ] || fail "missing hook"
+[ -f "$proj/.githooks/commit-msg" ] || fail "missing commit-msg hook"
 [ -f "$proj/.github/workflows/agency-check.yml" ] || fail "missing workflow"
 [ -f "$proj/agency-check.conf" ] || fail "missing conf"
 [ -f "$proj/.agents/skills/agency-check/SKILL.md" ] || fail "missing skill"

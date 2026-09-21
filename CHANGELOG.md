@@ -2,6 +2,16 @@
 
 所有规则/规范变更记录于此。版本语义见 `rules/evolution.md`（MAJOR=破坏性，MINOR=新增，PATCH=澄清/修正）。
 
+## v1.7.0（2026-09-20）
+
+**Git 规范：约定式提交 + 默认 GitHub Flow（MINOR）**
+
+- 新增 `rules/git.md`：Conventional Commits、分支命名、禁直推受保护主干、注释 SemVer tag。
+- 中央不强制 Git Flow / Husky / Commitlint / 工单号；未声明时默认 GitHub Flow，项目可在 `AGENTS.md` 覆盖。
+- 新增技能 `git-commit`（提交/分支/PR 时加载）；`agency route --install` 写入 `.agents/skills/git-commit`。
+- 新增 `templates/githooks/commit-msg`；`agency check --install` 一并写入 `.githooks/commit-msg`。
+- 总控 §6 增加提交/分支红线；路由表 `keyword|git`（`stack=any`，所有项目都注入摘要）。
+
 ## v1.6.0（2026-09-03）
 
 **增量规范门禁：只卡 diff，不卡存量（MINOR）**

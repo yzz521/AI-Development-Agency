@@ -37,6 +37,11 @@ assert_has "$out" "bug-fixing.md"
 out="$("$ROUTE" --dir "$ROOT" --task "无关闲聊" --stack java)"
 assert_has "$out" "rules/global.md"
 assert_has "$out" "rules/java.md"
+assert_no "$out" "rules/git.md"
+
+out="$("$ROUTE" --dir "$ROOT" --task "统一 commit message 和分支命名" --stack java)"
+assert_has "$out" "rules/git.md"
+assert_has "$out" "agency-route: matched=core,git,java"
 
 # 二次 install 不得因路由段里出现 Vue/React 字样而把全栈摘要写进去
 tmp="$(mktemp -d)"
@@ -45,6 +50,8 @@ printf '%s\n' '# demo' '后端：Java Spring Boot' > "$tmp/AGENTS.md"
 "$ROUTE" --install "$tmp" >/dev/null
 "$ROUTE" --install "$tmp" >/dev/null
 grep -q '^### rules/java.md$' "$tmp/AGENTS.md" || { rm -rf "$tmp"; fail "install 未写入 java 摘要"; }
+grep -q '^### rules/git.md$' "$tmp/AGENTS.md" || { rm -rf "$tmp"; fail "java 项目也应写入 git 摘要（stack=any）"; }
+[ -f "$tmp/.agents/skills/git-commit/SKILL.md" ] || { rm -rf "$tmp"; fail "install 未写入 git-commit 技能"; }
 if grep -q '^### rules/react.md$' "$tmp/AGENTS.md"; then rm -rf "$tmp"; fail "java 项目不该写入 react 摘要"; fi
 if grep -q '^### rules/vue.md$' "$tmp/AGENTS.md"; then rm -rf "$tmp"; fail "java 项目不该写入 vue 摘要"; fi
 grep -q '检测技术栈：java$' "$tmp/AGENTS.md" || { rm -rf "$tmp"; fail "二次 install 技术栈被路由段污染"; }
