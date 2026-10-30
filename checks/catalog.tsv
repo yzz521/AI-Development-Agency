@@ -23,3 +23,6 @@ vue-any|off|warning|*.vue,*.ts,*.tsx|vue-any|rules/vue.md|使用 any，参数应
 py-bare-except|on|error|*.py|py-bare-except|rules/python.md|裸 except 吞异常（含 KeyboardInterrupt），应指定异常类型或至少记日志
 py-mutable-default|on|error|*.py|py-mutable-default|rules/python.md|可变对象作默认参数，定义时求值一次、调用间共享同一实例
 py-eval-exec|on|warning|*.py|py-eval-exec|rules/python.md|eval/exec 动态执行，输入不可信时即代码注入（.eval() 方法调用已排除）
+java-new-thread|on|warning|*.java,*.kt|java-new-thread|rules/java.md|new Thread / Executors.newXxx 自建线程，线程池应由容器注入并配置队列与拒绝策略
+java-static-simpledateformat|on|error|*.java,*.kt|java-static-simpledateformat|rules/java.md|static SimpleDateFormat 非线程安全，并发下会解析出错乱日期，改用 DateTimeFormatter
+java-catch-return-null|on|warning|*.java,*.kt|java-catch-return-null|rules/java.md|catch 后 return null 掩盖失败，调用方无法区分"没数据"和"出错了"（单行 catch 才可判定，跨行会漏）

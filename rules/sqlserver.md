@@ -6,6 +6,7 @@
 - 索引和字段变更要结合真实访问模式，评估锁与执行时间。
 - 慢 SQL 先看 Query Store / Actual Execution Plan，关注参数嗅探、隐式转换、扫描。
 - 结构变更必须说明影响对象、数据量、窗口、锁、回滚、前后兼容。
+- 分页带确定性 ORDER BY；索引列上不套函数或隐式转换。
 
 ## Schema
 
@@ -21,6 +22,10 @@
 - 发现慢 SQL 时优先读取 Query Store / Actual Execution Plan。
 - 关注参数嗅探、隐式类型转换、扫描、Key Lookup、排序、Hash Join 等典型问题。
 - 批量操作必须评估事务大小、锁升级、TempDB 与日志压力。
+- 分页必须带**确定性** `ORDER BY`（含唯一列兜底）。只按非唯一列排序时，翻页会重复或漏行。
+- 禁止在索引列上套函数或做隐式转换（`WHERE YEAR(created_at)=2026`、`WHERE code=123` 而列是
+  `varchar`）。索引直接失效，退化成全表扫描。
+- 大表建索引评估 `ONLINE = ON`，避免长时间锁表影响写入。
 
 ## Migration
 
