@@ -26,11 +26,18 @@
 - `templates/task-report.md`：新增 `## Code Review` 小节（命令 / 结果 / Decision / 报告）。
 - `scripts/audit.sh` 新增第 7 项：L2/L3 缺 review 记录报 FAIL、结果未显示 `result=PASS` 报 FAIL、
   `Decision=REQUEST_CHANGES` 报 FAIL、报告文件不存在报 FAIL；L1 缺失仅告警。
-- `checks/catalog.tsv` 新增 9 条检查项，`run_engine` 补对应引擎：
+- `checks/catalog.tsv` 新增 12 条检查项，`run_engine` 补对应引擎：
   `java-empty-catch`（on）、`java-sql-concat`（on）、`java-createstatement`（on）、
   `sql-no-where`（on，仅单行语句）、`sql-dynamic-concat`（on）、`vue-purple-gradient`（on）、
+  `py-bare-except`（on）、`py-mutable-default`（on）、`py-eval-exec`（on）、
   `java-magic-number`（off）、`vue-options-api`（off）、`vue-any`（off）。
   默认关闭的三条误报面较宽（边界值、混用写法、类型桥接），由项目在 `agency-check.conf` 打开。
+  Python 三条原先完全缺失——改 `.py` 文件时门禁会 `result=PASS hits=0`，属于"假绿"；
+  `py-eval-exec` 已排除 `.eval()` 方法调用，避免 PyTorch 的 `model.eval()` 误报。
+- 修复 `scripts/route.sh` 摘要抽取夹带全文：`extract_summary` 原用 `$0 == "## 摘要（注入用）"`
+  精确比较，而本机 BSD awk 对含多字节字符的字符串会误判相等——`## 全文` 也能命中，
+  命中后 `next` 又短路掉下面的 `exit`，于是每个规则的摘要段之后把全文一并注入，
+  注入体积近乎翻倍（`rules/global.md` 从 5 行变 14 行）。改用 `/^## 摘要/` 正则前缀匹配。
 - 修复 `scripts/check.sh` 两处缺陷：
   - **性能**：`trim()` 原来每次 fork 一个 `sed`，在「每行 × 每检查项 × 每 glob」热路径上
     被调几十万次；改为纯 bash 参数展开后，一次暂存区检查从 >60s 降到 0.2s。

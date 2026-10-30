@@ -80,8 +80,11 @@ risk_from_rank() {
 extract_summary() {
   local file="$1"
   [ -f "$file" ] || return 1
+  # 不要用 $0 == "## 摘要（注入用）" 精确比较：本机 BSD awk 对含多字节字符的字符串
+  # 会误判相等——"## 全文" 也能命中，且命中后 next 短路掉下面的 exit，
+  # 结果摘要段之后把全文一并注入，上下文直接翻倍。改用正则前缀匹配规避。
   awk '
-    $0 == "## 摘要（注入用）" {on=1; next}
+    /^## 摘要/ {on=1; next}
     on && /^## / {exit}
     on && /^---$/ {exit}
     on {print}
