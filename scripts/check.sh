@@ -332,6 +332,23 @@ hit_py_eval_exec() {
   printf '%s' "$1" | grep -qE '(^|[^.[:alnum:]_])(eval|exec)[[:space:]]*[(]'
 }
 
+# ---- Java 并发与异常 ----
+# 自建线程/线程池：绕过容器管理，队列与拒绝策略不可控
+hit_java_new_thread() {
+  printf '%s' "$1" | grep -qE '(new[[:space:]]+Thread[[:space:]]*[(]|Executors[.]new)'
+}
+
+# static SimpleDateFormat：非线程安全，并发解析会出错乱日期
+hit_java_static_simpledateformat() {
+  printf '%s' "$1" | grep -qE 'static[^;=]*SimpleDateFormat'
+}
+
+# catch 后 return null：把"出错了"伪装成"没数据"
+# 只判单行 catch 块（catch (...) { return null; }）；跨行写法会漏，宁可漏报不误报
+hit_java_catch_return_null() {
+  printf '%s' "$1" | grep -qE 'catch[[:space:]]*[(][^)]*[)][^}]*return[[:space:]]+null'
+}
+
 run_engine() {
   local engine="$1" text="$2"
   case "$engine" in
@@ -356,6 +373,9 @@ run_engine() {
     py-bare-except) hit_py_bare_except "$text" ;;
     py-mutable-default) hit_py_mutable_default "$text" ;;
     py-eval-exec) hit_py_eval_exec "$text" ;;
+    java-new-thread) hit_java_new_thread "$text" ;;
+    java-static-simpledateformat) hit_java_static_simpledateformat "$text" ;;
+    java-catch-return-null) hit_java_catch_return_null "$text" ;;
     *) echo "未知 engine: $engine" >&2; return 1 ;;
   esac
 }
