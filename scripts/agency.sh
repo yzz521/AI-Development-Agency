@@ -7,7 +7,7 @@
 #   agency status [dir]            检查项目接入状态（doctor）
 #   agency doctor [dir]            同上（原 agency check 别名已让给门禁）
 #   agency check [dir]             增量规范门禁（只卡 diff；--install 写入 hook/CI）
-#   agency init [dir]              初始化项目接入（软链接 + AGENTS.md）
+#   agency init [dir] [--with-gate]  初始化接入（软链+AGENTS.md+全部技能）；--with-gate 连门禁一起装
 #   agency list [agents|rules|workflows|context]   列出分类内容
 #   agency use <agent> [--raw]     组装并打印某 Agent 的完整使用块（可选；提示词会自动路由）
 #   agency route [--task|--files|--dir]   查看本次任务命中的规范摘要（可选检查器）
@@ -58,7 +58,12 @@ cmd_status() {
 }
 
 cmd_init() {
-  "$SCRIPT_DIR/init-project.sh" "${1:-$(pwd)}"
+  # 透传全部参数：init-project.sh 自己解析 [dir] 与 --with-gate
+  if [ "$#" -eq 0 ]; then
+    "$SCRIPT_DIR/init-project.sh" "$(pwd)"
+  else
+    "$SCRIPT_DIR/init-project.sh" "$@"
+  fi
 }
 
 cmd_list() {

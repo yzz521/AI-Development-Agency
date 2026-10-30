@@ -36,8 +36,25 @@
     被调几十万次；改为纯 bash 参数展开后，一次暂存区检查从 >60s 降到 0.2s。
   - **空仓库**：还没有任何 commit 时 `git diff HEAD` 失败（退出 128），首次提交前检查直接挂掉；
     改为先探测 `HEAD` 是否存在，无 HEAD 时只扫未跟踪文件。
+- 接入范围修正（原 `agency init` 只落地 2 个技能，其余 7 个装了 Agency 也用不到）：
+  - `agency route --install` 改为安装 `skills/` 下**全部**技能，不再硬编码 `agency-route` + `git-commit`。
+    尤其 `agency-task` 不落地时，L2/L3 的 `audit` 会因缺任务单直接 FAIL。
+  - `agency init` 新增 `--with-gate`：一条命令装全（软链 + AGENTS.md + 全部技能 + 门禁）。
+    默认仍不装门禁——它会 `git config core.hooksPath` 并写入 CI，属于改变提交行为的强制项，
+    不该在用户"只想接个规范"时静默生效。
+  - `scripts/doctor.sh` 改为核对技能数量（原只检查 `agency-route` 一个，且把 `skills/README.md`
+    也数成技能），并新增 Cursor hook 检查。
+  - 修复 `agency init` 首次接入技术栈永远检测成全量：init 原先先复制
+    `templates/project-AGENTS.md` 再跑 `route --install`，而 `detect_stack` 会读 AGENTS.md 兜底，
+    模板里罗列了全部技术栈示例（连"检测技术栈：java,vue,react,python,sqlserver,ai,healthcare,any"
+    这行都在），于是每个新项目都被判定为全栈，摘要失去裁剪意义。改为交给 `route --install`
+    自己创建 AGENTS.md，检测只依据真实文件特征（`pom.xml` / `*.vue` / `*.sql` 等）。
+- 文档：`adapters/README.md` 新增「分层：哪些平台通用，哪些平台专属」与「各平台怎么用」两张表，
+  明确 `agency check` + git hook + CI **与平台无关**，Cursor stop hook 只是减少提交往返的增益；
+  README 安装步骤去掉重复的 `agency init`，补 `--with-gate` 与 `agency status` 自查。
 - 升级方式：`agency update` 后重跑 `agency check --install <项目>` 以获取 Cursor stop hook
-  （已有 `.cursor/hooks.json` 的项目需手工合并 stop 段）。**注意**：`audit` 新增 FAIL 项属行为收紧，
+  （已有 `.cursor/hooks.json` 的项目需手工合并 stop 段）；重跑 `agency route --install <项目>`
+  可补齐全部技能。**注意**：`audit` 新增 FAIL 项属行为收紧，
   历史 L2/L3 任务单可能出现新的 FAIL，属预期，需补 review 记录。
 
 ## v1.7.0（2026-09-20）

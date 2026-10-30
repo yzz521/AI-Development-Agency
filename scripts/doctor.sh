@@ -12,7 +12,23 @@ else
   fail "缺少 AGENTS.md"
 fi
 [ -f "$PROJECT_DIR/.cursor/rules/agency-router.mdc" ] && ok "Cursor 自动路由规则" || warn "无 .cursor/rules/agency-router.mdc（仅 Cursor 增益）"
-[ -f "$PROJECT_DIR/.agents/skills/agency-route/SKILL.md" ] && ok "agency-route 技能" || warn "无 .agents/skills/agency-route（技能自动匹配不可用）"
+[ -f "$PROJECT_DIR/.cursor/hooks.json" ] && ok "Cursor stop hook" || warn "无 .cursor/hooks.json（仅 Cursor 增益，其他平台可忽略）"
+# 技能是纯 Markdown，全部落地才有完整能力：agency-task 缺失会让 L2/L3 的 audit 因缺任务单直接 fail
+sk_have=0; sk_all=0
+# 只数目录：skills/ 下还有 README.md，用 ls -1 会把文件也数进去
+if [ -d "$PROJECT_DIR/.agents/skills" ]; then
+  sk_have="$(ls -1d "$PROJECT_DIR"/.agents/skills/*/ 2>/dev/null | wc -l | tr -d ' ')"
+fi
+if [ -d "$AGENCY_ROOT/skills" ]; then
+  sk_all="$(ls -1d "$AGENCY_ROOT"/skills/*/ 2>/dev/null | wc -l | tr -d ' ')"
+fi
+if [ "$sk_all" -gt 0 ] && [ "$sk_have" -ge "$sk_all" ]; then
+  ok "技能 $sk_have/$sk_all 已落地"
+elif [ "$sk_have" -gt 0 ]; then
+  warn "技能 $sk_have/$sk_all（缺的用 agency route --install 补齐）"
+else
+  warn "无 .agents/skills（技能自动匹配不可用）"
+fi
 if [ -L "$LINK" ]; then
   resolved="$(cd "$(dirname "$LINK")" && cd "$(readlink "$LINK")" 2>/dev/null && pwd || true)"
   [ "$resolved" = "$AGENCY_ROOT" ] && ok ".ai/agency 正确" || fail ".ai/agency 指向错误"
@@ -36,6 +52,6 @@ if [ -f "$PROJECT_DIR/.agency-check/check.sh" ] || [ -f "$PROJECT_DIR/agency-che
   fi
   [ -f "$PROJECT_DIR/.github/workflows/agency-check.yml" ] && ok "CI agency-check.yml" || warn "无 .github/workflows/agency-check.yml"
 else
-  warn "未安装增量门禁（需要时: agency check --install；不绑进 init）"
+  warn "未安装增量门禁（agency check --install 补装，或 agency init --with-gate 一步到位）"
 fi
 echo; echo "PASS=$PASS WARN=$WARN FAIL=$FAIL"; [ "$FAIL" -eq 0 ]

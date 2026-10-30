@@ -515,8 +515,16 @@ cmd_install() {
   cp -R "$AGENCY_ROOT/skills/agency-check" "$dir/.agents/skills/agency-check"
   echo "✓ 写入 $dir/.agents/skills/agency-check/"
 
+  # code-review 与门禁同属审查侧：机器门禁先行，FAIL 就停，机器过了才做语义审查。
+  # 装在这里而不是 route --install，是因为它依赖 agency check 的产出格式。
+  rm -rf "$dir/.agents/skills/code-review"
+  cp -R "$AGENCY_ROOT/skills/code-review" "$dir/.agents/skills/code-review"
+  echo "✓ 写入 $dir/.agents/skills/code-review/（Cursor 里 /code-review 可调用）"
+
   # Cursor stop hook：Agent 会话内拦截。
   # git hook 只拦"提交"，拦不住"AI 说做完了但没过检查"——这是两件不同的事。
+  # 只有 Cursor 消费这个文件；其他 harness（Codex / DeepSeek / Kimi 等）忽略即可，
+  # 它们的强制力来自 .githooks + CI，不依赖平台特性。
   if [ -f "$dir/.cursor/hooks.json" ]; then
     echo "⚠ 已存在 $dir/.cursor/hooks.json，未覆盖。"
     echo "  如需启用 stop hook，请把 templates/cursor-hooks/hooks.json 的 stop 段合并进去，"
@@ -526,7 +534,7 @@ cmd_install() {
     cp "$AGENCY_ROOT/templates/cursor-hooks/hooks.json" "$dir/.cursor/hooks.json"
     cp "$AGENCY_ROOT/templates/cursor-hooks/agency-stop.sh" "$dir/.cursor/hooks/agency-stop.sh"
     chmod +x "$dir/.cursor/hooks/agency-stop.sh"
-    echo "✓ 写入 $dir/.cursor/hooks.json + .cursor/hooks/agency-stop.sh（Agent 结束时拦截）"
+    echo "✓ 写入 $dir/.cursor/hooks.json + .cursor/hooks/agency-stop.sh（仅 Cursor 使用，其他平台可忽略）"
   fi
 
   if [ -d "$dir/.git" ] || git -C "$dir" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
@@ -540,7 +548,7 @@ cmd_install() {
 
   echo
   echo "完成。请提交："
-  echo "  agency-check.conf .agency-check/ .githooks/ .cursor/ .github/workflows/agency-check.yml .agents/skills/agency-check/"
+  echo "  agency-check.conf .agency-check/ .githooks/ .cursor/ .github/workflows/agency-check.yml .agents/skills/agency-check/ .agents/skills/code-review/"
   echo "同事 clone 后（可选本机 hook）：git config core.hooksPath .githooks"
   echo "未设 hook 时仍靠 CI 强制。不要用 --all 当提交门禁。"
   echo "Cursor 用户：stop hook 需在 trusted workspace 中生效，可在 Customize → Hooks 查看加载状态。"
