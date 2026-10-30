@@ -13,11 +13,14 @@ Cursor 负责执行；Agency 负责规范。用户直接下任务，**不必先�
 | 按任务 | `.agents/skills/agency-route/` | description 匹配写代码任务 |
 | 会话内拦截 | `.cursor/hooks.json` + `.cursor/hooks/agency-stop.sh` | Agent 想结束时跑增量门禁，有 FAIL 就拽回来 |
 
-写入方式（每个项目一次，或 `agency init` 已做）：
+写入方式（每个项目一次）：
 
 ```bash
-agency route --install /path/to/project   # 常驻摘要 + 路由技能
-agency check --install /path/to/project   # git hook + CI + Cursor stop hook
+agency init /path/to/project --with-gate   # 一步到位：软链 + AGENTS.md + 全部技能 + 门禁
+
+# 或分两步（想先只装规范、稍后再开门禁）
+agency route --install /path/to/project    # 常驻摘要 + 全部技能
+agency check --install /path/to/project    # git hook + CI + Cursor stop hook
 ```
 
 按该项目技术栈裁剪摘要。之后 clone 仓库的同事无需再装 CLI 也能自动路由。

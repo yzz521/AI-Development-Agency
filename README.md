@@ -105,18 +105,21 @@ AI-Development-Agency/
 # 1) 安装 agency 命令到 PATH（~/.local/bin 或 ~/bin）
 ./scripts/install-cli.sh
 
-# 2) 把本规范接入你的项目（.ai/agency 软链接 + 项目 AGENTS.md，已有不覆盖）
-agency init ~/workspace/你的项目
-
-# 3) 接入时写入「提示词自动路由」（AGENTS.md 段 + Cursor 规则 + 技能，均可提交）
+# 2) 接入你的项目：.ai/agency 软链 + 项目 AGENTS.md + 路由段 + 全部技能
 #    之后直接对 AI 下任务即可，不必先记 agency use / agency route
 agency init ~/workspace/你的项目
 
-# 4) 可选：检查这次任务会命中哪些摘要
+# 2b) 想一步装全（连增量门禁一起）：加 --with-gate
+agency init ~/workspace/你的项目 --with-gate
+
+# 3) 可选：检查这次任务会命中哪些摘要
 agency route --task "给审核加一个查询接口" --files Foo.java
 
-# 5) 可选、单独执行：增量门禁（hook + CI，不绑进 init）
+# 4) 若第 2 步没加 --with-gate，单独补装门禁（git hook + CI + Cursor stop hook）
 agency check --install ~/workspace/你的项目
+
+# 5) 随时自查接入状态：AGENTS.md / 技能 / 门禁 / hook 哪项缺一目了然
+agency status ~/workspace/你的项目
 
 # 6) 收工：记录规则使用反馈（自进化的起点）
 agency feedback --kind rule_gap --detail "遇到的问题"
