@@ -43,6 +43,7 @@ description: 一句话说明「做什么 + 什么时候用」，把触发词嵌�
 | --- | --- | --- |
 | `skills/agency-route/SKILL.md` | 写代码 / 改接口 / 改页面 | 读路由表，注入命中规则的摘要；**不要求用户跑 CLI** |
 | `skills/agency-check/SKILL.md` | 门禁 / hook / CI / 增量检查 | 跑 `agency check`；技能无强制力，强制靠 hook+CI |
+| `skills/code-review/SKILL.md` | review 改动 / 提交前检查 / 标 DONE 前 | 先跑 `agency check`，再只审机器查不了的，产出 `code-review.md` |
 | `skills/git-commit/SKILL.md` | 提交 / 分支 / PR / tag | 读 `rules/git.md` 摘要；不另起分支模型 |
 | `skills/debt/SKILL.md` | 收割债务 / 清单简化的债 | 跑 `agency debt` 输出台账 |
 | `skills/task-audit/SKILL.md` | 查 AI 是否真实执行 / 审计任务单 | 跑 `agency audit` + 解读 |

@@ -11,3 +11,15 @@ sql-backtick|off|error|*.sql,*Mapper.xml,*mapper.xml,*.xml|sql-backtick|rules/sq
 java-fqcn|off|warning|*.java|java-fqcn|rules/java.md|禁止行内全限定类名（必须排除 import；误报过 18 倍，默认关）
 java-requestbody-valid|off|warning|*.java|java-requestbody-valid|rules/java.md|@RequestBody 应同时有 @Valid/@Validated（分行注解会漏检，默认关）
 java-sensitive-log|off|warning|*.java,*.kt|java-sensitive-log|rules/healthcare.md|日志疑似带患者身份/证件号等敏感字段（字段清单未定，默认关）
+java-empty-catch|on|error|*.java,*.kt|java-empty-catch|rules/java.md|空 catch 吞异常，至少记日志或转译为业务异常
+java-sql-concat|on|error|*.java,*.kt|java-sql-concat|rules/security.md|SQL 字符串拼接（注入风险），改用参数化查询
+java-createstatement|on|warning|*.java|java-createstatement|rules/security.md|使用 createStatement，改用 prepareStatement
+sql-no-where|on|error|*.sql,*Mapper.xml,*mapper.xml|sql-no-where|rules/sqlserver.md|单行 UPDATE/DELETE 缺 WHERE（多行语句不在本检查范围，需人工确认）
+sql-dynamic-concat|on|error|*.sql,*Mapper.xml,*mapper.xml|sql-dynamic-concat|rules/sqlserver.md|动态 SQL 字符串拼接，改用 sp_executesql 参数化
+vue-purple-gradient|on|warning|*.vue,*.css,*.scss,*.less|vue-purple-gradient|rules/vue.md|蓝紫渐变不宜作为默认审美
+java-magic-number|off|warning|*.java,*.kt|java-magic-number|rules/java.md|疑似魔法值，改用常量类或 Enum（边界值场景多，默认关）
+vue-options-api|off|warning|*.vue|vue-options-api|rules/vue.md|使用 Options API，项目统一用 script setup 时可打开
+vue-any|off|warning|*.vue,*.ts,*.tsx|vue-any|rules/vue.md|使用 any，参数应为明确类型（类型声明与第三方桥接会误报，默认关）
+py-bare-except|on|error|*.py|py-bare-except|rules/python.md|裸 except 吞异常（含 KeyboardInterrupt），应指定异常类型或至少记日志
+py-mutable-default|on|error|*.py|py-mutable-default|rules/python.md|可变对象作默认参数，定义时求值一次、调用间共享同一实例
+py-eval-exec|on|warning|*.py|py-eval-exec|rules/python.md|eval/exec 动态执行，输入不可信时即代码注入（.eval() 方法调用已排除）

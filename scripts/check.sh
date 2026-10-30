@@ -38,7 +38,14 @@ usage() { sed -n '3,20p' "$0" | sed 's/^# \{0,1\}//'; }
 
 # ---------- bash 3.2 工具 ----------
 
-trim() { printf '%s' "$1" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'; }
+# 纯 bash 去空白。不要改成 `sed` —— 本函数在「每行 × 每个检查项 × 每个 glob」
+# 的热路径上被调用几十万次，每次 fork 一个 sed 会让一次提交检查从毫秒级变成分钟级。
+trim() {
+  local s="$1"
+  s="${s#"${s%%[![:space:]]*}"}"
+  s="${s%"${s##*[![:space:]]}"}"
+  printf '%s' "$s"
+}
 
 csv_has() {
   local csv="$1" item="$2" x rest
@@ -261,6 +268,70 @@ hit_secret() {
   return 0
 }
 
+hit_java_empty_catch() {
+  printf '%s' "$1" | grep -qE 'catch[[:space:]]*\([^)]*\)[[:space:]]*\{[[:space:]]*\}'
+}
+
+# SQL 关键字 + 字符串拼接：两个条件都要满足，单条 ERE 表达不了 AND，故分两步
+hit_java_sql_concat() {
+  printf '%s' "$1" | grep -qiE '(select|insert|update|delete)[[:space:]]' || return 1
+  printf '%s' "$1" | grep -qE '"[[:space:]]*\+' && return 0
+  printf '%s' "$1" | grep -qE '\+[[:space:]]*"' && return 0
+  return 1
+}
+
+hit_java_createstatement() {
+  printf '%s' "$1" | grep -qE '\.createStatement[[:space:]]*\('
+}
+
+# 只判「单行内以分号结束」的 UPDATE/DELETE，多行语句会漏检但不会误报。
+# 多行无 WHERE 的语句靠 code-review 语义审查兜。
+hit_sql_no_where() {
+  local s="$1"
+  printf '%s' "$s" | grep -qiE '(^|[^[:alnum:]_])(update|delete)[[:space:]]' || return 1
+  printf '%s' "$s" | grep -qiE 'update[[:space:]]+statistics' && return 1
+  printf '%s' "$s" | grep -qi 'where' && return 1
+  printf '%s' "$s" | grep -q ';' || return 1
+  return 0
+}
+
+hit_sql_dynamic_concat() {
+  printf '%s' "$1" | grep -qiE "(exec[[:space:]]*\([[:space:]]*['\"]|sp_executesql[[:space:]]+@[[:alnum:]_]+[[:space:]]*\+|@sql[[:space:]]*=[^;]*\+)"
+}
+
+hit_vue_purple_gradient() {
+  printf '%s' "$1" | grep -qiE 'gradient[^;]*(indigo|purple|violet|blue)-[0-9]{3}|gradient[^;]*#(6366f1|8b5cf6|7c3aed|a855f7|4f46e5|3b82f6|818cf8|a78bfa)'
+}
+
+hit_java_magic_number() {
+  printf '%s' "$1" | grep -qE '((==|!=)[[:space:]]*-?[0-9]{2,}|case[[:space:]]+[0-9]{2,}[[:space:]]*:)'
+}
+
+hit_vue_options_api() {
+  printf '%s' "$1" | grep -qE 'export[[:space:]]+default[[:space:]]*\{'
+}
+
+hit_vue_any() {
+  printf '%s' "$1" | grep -qE '(:[[:space:]]*any[^[:alnum:]_]|<any>|as[[:space:]]+any)'
+}
+
+# ---- Python ----
+# 裸 except：没有异常类型，连 KeyboardInterrupt / SystemExit 一起吞
+hit_py_bare_except() {
+  printf '%s' "$1" | grep -qE '^[[:space:]]*except[[:space:]]*:'
+}
+
+# 可变默认参数：默认值在函数定义时求值一次，所有调用共享同一实例
+# 用 [(] 与 [{][}] 而非 \( \{ \}：本机 grep 是 toybox，不支持 GNU 转义
+hit_py_mutable_default() {
+  printf '%s' "$1" | grep -qE 'def[[:space:]]+[[:alnum:]_]+[[:space:]]*[(].*=[[:space:]]*(\[\]|[{][}])'
+}
+
+# eval/exec 动态执行。排除 .eval( —— PyTorch 的 model.eval() 是标准写法，不是代码注入
+hit_py_eval_exec() {
+  printf '%s' "$1" | grep -qE '(^|[^.[:alnum:]_])(eval|exec)[[:space:]]*[(]'
+}
+
 run_engine() {
   local engine="$1" text="$2"
   case "$engine" in
@@ -273,6 +344,18 @@ run_engine() {
     java-fqcn) hit_fqcn "$text" ;;
     java-requestbody-valid) hit_requestbody_valid "$text" ;;
     java-sensitive-log) hit_sensitive_log "$text" ;;
+    java-empty-catch) hit_java_empty_catch "$text" ;;
+    java-sql-concat) hit_java_sql_concat "$text" ;;
+    java-createstatement) hit_java_createstatement "$text" ;;
+    sql-no-where) hit_sql_no_where "$text" ;;
+    sql-dynamic-concat) hit_sql_dynamic_concat "$text" ;;
+    vue-purple-gradient) hit_vue_purple_gradient "$text" ;;
+    java-magic-number) hit_java_magic_number "$text" ;;
+    vue-options-api) hit_vue_options_api "$text" ;;
+    vue-any) hit_vue_any "$text" ;;
+    py-bare-except) hit_py_bare_except "$text" ;;
+    py-mutable-default) hit_py_mutable_default "$text" ;;
+    py-eval-exec) hit_py_eval_exec "$text" ;;
     *) echo "未知 engine: $engine" >&2; return 1 ;;
   esac
 }
@@ -363,7 +446,11 @@ collect_added() {
       git_in diff -U0 --diff-filter=ACMR --src-prefix=a/ --dst-prefix=b/ "$BASE"...HEAD | parse_unified_diff >> "$out"
       ;;
     work)
-      git_in diff -U0 --diff-filter=ACMR --src-prefix=a/ --dst-prefix=b/ HEAD | parse_unified_diff >> "$out"
+      # 空仓库（还没有任何 commit）时 HEAD 不存在，`git diff HEAD` 会失败。
+      # 此时没有"已跟踪文件的改动"，只需扫未跟踪文件即可。
+      if git_in rev-parse --verify HEAD >/dev/null 2>&1; then
+        git_in diff -U0 --diff-filter=ACMR --src-prefix=a/ --dst-prefix=b/ HEAD | parse_unified_diff >> "$out"
+      fi
       git_in ls-files --others --exclude-standard -z | while IFS= read -r -d '' rel; do
         skip_path "$rel" && continue
         emit_file_lines "$rel" "$GIT_ROOT/$rel"
@@ -448,6 +535,28 @@ cmd_install() {
   cp -R "$AGENCY_ROOT/skills/agency-check" "$dir/.agents/skills/agency-check"
   echo "✓ 写入 $dir/.agents/skills/agency-check/"
 
+  # code-review 与门禁同属审查侧：机器门禁先行，FAIL 就停，机器过了才做语义审查。
+  # 装在这里而不是 route --install，是因为它依赖 agency check 的产出格式。
+  rm -rf "$dir/.agents/skills/code-review"
+  cp -R "$AGENCY_ROOT/skills/code-review" "$dir/.agents/skills/code-review"
+  echo "✓ 写入 $dir/.agents/skills/code-review/（Cursor 里 /code-review 可调用）"
+
+  # Cursor stop hook：Agent 会话内拦截。
+  # git hook 只拦"提交"，拦不住"AI 说做完了但没过检查"——这是两件不同的事。
+  # 只有 Cursor 消费这个文件；其他 harness（Codex / DeepSeek / Kimi 等）忽略即可，
+  # 它们的强制力来自 .githooks + CI，不依赖平台特性。
+  if [ -f "$dir/.cursor/hooks.json" ]; then
+    echo "⚠ 已存在 $dir/.cursor/hooks.json，未覆盖。"
+    echo "  如需启用 stop hook，请把 templates/cursor-hooks/hooks.json 的 stop 段合并进去，"
+    echo "  并放置 .cursor/hooks/agency-stop.sh。"
+  else
+    mkdir -p "$dir/.cursor/hooks"
+    cp "$AGENCY_ROOT/templates/cursor-hooks/hooks.json" "$dir/.cursor/hooks.json"
+    cp "$AGENCY_ROOT/templates/cursor-hooks/agency-stop.sh" "$dir/.cursor/hooks/agency-stop.sh"
+    chmod +x "$dir/.cursor/hooks/agency-stop.sh"
+    echo "✓ 写入 $dir/.cursor/hooks.json + .cursor/hooks/agency-stop.sh（仅 Cursor 使用，其他平台可忽略）"
+  fi
+
   if [ -d "$dir/.git" ] || git -C "$dir" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     if [ -f "$dir/.husky/pre-commit" ] || [ -f "$dir/.husky/commit-msg" ]; then
       echo "⚠ 检测到 husky，未设置 core.hooksPath。请把 .githooks/pre-commit 与 .githooks/commit-msg 中的调用并进对应 husky 钩子。"
@@ -459,9 +568,10 @@ cmd_install() {
 
   echo
   echo "完成。请提交："
-  echo "  agency-check.conf .agency-check/ .githooks/ .github/workflows/agency-check.yml .agents/skills/agency-check/"
+  echo "  agency-check.conf .agency-check/ .githooks/ .cursor/ .github/workflows/agency-check.yml .agents/skills/agency-check/ .agents/skills/code-review/"
   echo "同事 clone 后（可选本机 hook）：git config core.hooksPath .githooks"
   echo "未设 hook 时仍靠 CI 强制。不要用 --all 当提交门禁。"
+  echo "Cursor 用户：stop hook 需在 trusted workspace 中生效，可在 Customize → Hooks 查看加载状态。"
 }
 
 # ---------- 参数 ----------

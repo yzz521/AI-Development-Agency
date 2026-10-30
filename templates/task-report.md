@@ -38,6 +38,16 @@
 - 命令：
 - 结果：
 
+## Code Review
+
+> L2 必填，L3 必填且须附报告文件；L1 可留空。
+> 先跑 `agency check`（机器门禁），再走 `skills/code-review` 做语义审查。
+
+- 命令：
+- 结果：
+- Decision：
+- 报告：
+
 ## 规则反馈
 
 > 按 rules/evolution.md 记录；kind：rule_applied / rule_violated / rule_gap / rule_stale / workflow_ok / workflow_gap / context_gap
@@ -51,6 +61,8 @@
 任务：
 修改：
 验证：
+机器检查：
+Review：
 风险：
 未完成事项：
 ```

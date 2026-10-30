@@ -12,6 +12,7 @@
 #   4. "涉及规则"是否能在项目 .ai/agency 规范库中解析到
 #   5. 规则反馈 kind 是否合法
 #   6. 验证命令仅列出供人工重跑（audit 不代跑，防报告注入命令）
+#   7. Code Review 记录（L2/L3 必须有，且 result=PASS、Decision 非返工态）
 #
 # 局限（诚实声明）：audit 只能证明"汇报内部自洽、文件真实存在、有改动痕迹、回执格式对"，
 # 无法证明"AI 真的阅读了规则正文"——那需要人工抽查会话记录。
@@ -162,6 +163,38 @@ for f in "$TASK_DIR"/*.md; do
   # 6. 验证命令（只列出，供人工重跑）
   cmd="$(section_lines "$f" "验证" '- 命令：' | sed 's/^- 命令：//' | xargs)"
   [ -n "$cmd" ] && ok "验证命令（人工可重跑）: $cmd" || warn "未填写验证命令"
+
+  # 7. Code Review（L2/L3 必须做，且结论不能是需要返工）
+  cr_cmd="$(section_lines "$f" "Code Review" '- 命令：' | sed 's/^- 命令：//' | xargs)"
+  cr_res="$(section_lines "$f" "Code Review" '- 结果：' | sed 's/^- 结果：//' | xargs)"
+  cr_dec="$(section_lines "$f" "Code Review" '- Decision：' | sed 's/^- Decision：//' | xargs)"
+  cr_rep="$(section_lines "$f" "Code Review" '- 报告：' | sed 's/^- 报告：//' | xargs | tr -d '`')"
+
+  if [ -z "$cr_res" ] && [ -z "$cr_dec" ]; then
+    case "$level" in
+      L2|L3) fail "$level 任务缺少 Code Review 记录（先 agency check，再 skills/code-review）";;
+      *)     warn "未填写 Code Review 记录（L1 可略）";;
+    esac
+  else
+    case "$cr_res" in
+      *result=PASS*) ok "机器检查: result=PASS";;
+      *)             fail "机器检查结果未显示 result=PASS: ${cr_res:-空}";;
+    esac
+    case "$cr_dec" in
+      APPROVE|APPROVE_WITH_NITS) ok "Code Review Decision: $cr_dec";;
+      REQUEST_CHANGES)           fail "Code Review Decision 为 REQUEST_CHANGES，不得标 DONE";;
+      BLOCKED)                   fail "Code Review Decision 为 BLOCKED，缺关键信息";;
+      "")                        fail "缺 Code Review Decision";;
+      *)                         fail "非法 Code Review Decision: $cr_dec";;
+    esac
+    if [ -n "$cr_rep" ]; then
+      if ref_exists "$project" "$cr_rep"; then ok "Review 报告: $cr_rep"
+      else fail "Review 报告不存在: $cr_rep"; fi
+    else
+      warn "未填写 Review 报告路径"
+    fi
+    [ -n "$cr_cmd" ] && ok "Review 命令（人工可重跑）: $cr_cmd" || warn "未填写 Review 命令"
+  fi
 done
 
 echo

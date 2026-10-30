@@ -80,8 +80,11 @@ risk_from_rank() {
 extract_summary() {
   local file="$1"
   [ -f "$file" ] || return 1
+  # 不要用 $0 == "## 摘要（注入用）" 精确比较：本机 BSD awk 对含多字节字符的字符串
+  # 会误判相等——"## 全文" 也能命中，且命中后 next 短路掉下面的 exit，
+  # 结果摘要段之后把全文一并注入，上下文直接翻倍。改用正则前缀匹配规避。
   awk '
-    $0 == "## 摘要（注入用）" {on=1; next}
+    /^## 摘要/ {on=1; next}
     on && /^## / {exit}
     on && /^---$/ {exit}
     on {print}
@@ -561,15 +564,21 @@ cmd_install() {
   echo "✓ 写入 $dir/.cursor/rules/agency-router.mdc"
 
   mkdir -p "$dir/.agents/skills"
-  rm -rf "$dir/.agents/skills/agency-route"
-  cp -R "$AGENCY_ROOT/skills/agency-route" "$dir/.agents/skills/agency-route"
-  echo "✓ 写入 $dir/.agents/skills/agency-route/"
-  rm -rf "$dir/.agents/skills/git-commit"
-  cp -R "$AGENCY_ROOT/skills/git-commit" "$dir/.agents/skills/git-commit"
-  echo "✓ 写入 $dir/.agents/skills/git-commit/"
+  # 技能是纯 Markdown，安装零副作用，因此全部落地。
+  # 只装两个会让用户"装了 Agency 却不知道还有 task-audit / diff-review / debt / agency-task"
+  # ——尤其 agency-task 不装，L2/L3 的 audit 会因为缺任务单直接 fail。
+  # 门禁类技能（agency-check / code-review）也在这里落地，agency check --install 会幂等覆盖。
+  local sk name
+  for sk in "$AGENCY_ROOT"/skills/*/; do
+    [ -d "$sk" ] || continue
+    name="${sk%/}"; name="${name##*/}"
+    rm -rf "$dir/.agents/skills/$name"
+    cp -R "$sk" "$dir/.agents/skills/$name"
+    echo "✓ 写入 $dir/.agents/skills/$name/"
+  done
 
   rm -f "$snippet"
-  echo "完成：提示词自动路由已写入项目（可提交 AGENTS.md / .cursor/rules / .agents/skills/agency-route / .agents/skills/git-commit）"
+  echo "完成：提示词自动路由已写入项目（可提交 AGENTS.md / .cursor/rules / .agents/skills/）"
   echo "技术栈: ${stack:-未检测，已写入全量摘要}"
 }
 
