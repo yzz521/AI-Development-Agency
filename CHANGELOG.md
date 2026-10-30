@@ -2,6 +2,44 @@
 
 所有规则/规范变更记录于此。版本语义见 `rules/evolution.md`（MAJOR=破坏性，MINOR=新增，PATCH=澄清/修正）。
 
+## v1.8.0（2026-10-30）
+
+**Code Review 闭环：会话内拦截 + 评审流程 + 9 条检查项（MINOR）**
+
+问题：`agency check` 只挂在 git hook 和 CI 上，拦得住"提交"，拦不住"AI 说做完了其实没过门禁"；
+`AGENTS.md` §3 第 9 步仍是"必要时进行 Code Review"，等于不做也没错；`artifacts/templates/code-review.md`
+是 8 个空标题，没有判定标准；`audit` 完全不校验 review 是否真的做过。
+
+- 新增 Cursor `stop` hook（`templates/cursor-hooks/`，由 `agency check --install` 一并写入）：
+  Agent 想结束一轮时跑增量门禁，有 FAIL 就通过 `followup_message` 把它拽回来继续修。
+  带三重防打扰——只在有未提交改动时跑、只在 `result=FAIL` 时介入、`loop_limit=2` 防循环。
+  已存在的 `.cursor/hooks.json` 不覆盖，提示手工合并。
+- 新增 `skills/code-review`：机器门禁先行 + 语义审查补充。**门禁 FAIL 时直接停**，
+  不做语义审查——机器能抓的都没过，往下审会稀释重点。
+- 重写 `artifacts/templates/code-review.md`：机器门禁结果、检查清单、Findings、误报申诉、
+  语义审查、Decision 四选一（原为 8 个空标题）。
+- `agents/quality/code-reviewer.md`：必读加 `checks/catalog.tsv` 与报告模板；工作方法第 0 步
+  改为跑 `agency check`；硬约束加"门禁 FAIL 不得 APPROVE"。
+- `AGENTS.md` §3 第 9 步：「必要时进行 Code Review」→「运行 `agency check`，`result=PASS`
+  才能收尾；L2 至少一次 Code Review，L3 必须 Code Review + Security Review」；
+  §7 汇报格式新增「机器检查」「Code Review」两行。
+- `templates/task-report.md`：新增 `## Code Review` 小节（命令 / 结果 / Decision / 报告）。
+- `scripts/audit.sh` 新增第 7 项：L2/L3 缺 review 记录报 FAIL、结果未显示 `result=PASS` 报 FAIL、
+  `Decision=REQUEST_CHANGES` 报 FAIL、报告文件不存在报 FAIL；L1 缺失仅告警。
+- `checks/catalog.tsv` 新增 9 条检查项，`run_engine` 补对应引擎：
+  `java-empty-catch`（on）、`java-sql-concat`（on）、`java-createstatement`（on）、
+  `sql-no-where`（on，仅单行语句）、`sql-dynamic-concat`（on）、`vue-purple-gradient`（on）、
+  `java-magic-number`（off）、`vue-options-api`（off）、`vue-any`（off）。
+  默认关闭的三条误报面较宽（边界值、混用写法、类型桥接），由项目在 `agency-check.conf` 打开。
+- 修复 `scripts/check.sh` 两处缺陷：
+  - **性能**：`trim()` 原来每次 fork 一个 `sed`，在「每行 × 每检查项 × 每 glob」热路径上
+    被调几十万次；改为纯 bash 参数展开后，一次暂存区检查从 >60s 降到 0.2s。
+  - **空仓库**：还没有任何 commit 时 `git diff HEAD` 失败（退出 128），首次提交前检查直接挂掉；
+    改为先探测 `HEAD` 是否存在，无 HEAD 时只扫未跟踪文件。
+- 升级方式：`agency update` 后重跑 `agency check --install <项目>` 以获取 Cursor stop hook
+  （已有 `.cursor/hooks.json` 的项目需手工合并 stop 段）。**注意**：`audit` 新增 FAIL 项属行为收紧，
+  历史 L2/L3 任务单可能出现新的 FAIL，属预期，需补 review 记录。
+
 ## v1.7.0（2026-09-20）
 
 **Git 规范：约定式提交 + 默认 GitHub Flow（MINOR）**

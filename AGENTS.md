@@ -1,4 +1,4 @@
-# AI Development Agency — 总控规则 v1.7.0
+# AI Development Agency — 总控规则 v1.8.0
 
 ## 1. 项目定位
 
@@ -44,7 +44,8 @@
 6. 阅读真实代码、配置、测试和数据库结构。
 7. 执行任务。
 8. 按 Agent 自身的“完成标准”自检。
-9. 必要时进行 QA / Security / Code Review。
+9. 运行 `agency check`（增量门禁），`result=PASS` 才能收尾；L2 至少一次 Code Review，L3 必须 Code Review + Security Review。
+   机器覆盖不到的语义问题（正确性、事务边界、异步四态、过度设计）走 `skills/code-review`，产出 `code-review.md`。
 10. 汇总最终结果。
 11. 按 `rules/evolution.md` 记录规则反馈（`agency feedback`）；发现规则缺口时创建提案（`agency propose`）。
 
@@ -320,6 +321,8 @@ Map / 魔法值 / 业务 PathVariable 等见 Java 条件加载摘要。数据库
 涉及文件：
 验证方式：
 验证结果：
+机器检查（命令 / 结果）：
+Code Review（Decision / 报告）：
 规则反馈（kind / 证据 / 提案）：
 风险：
 回滚方案：
