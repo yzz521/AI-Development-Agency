@@ -2,6 +2,36 @@
 
 所有规则/规范变更记录于此。版本语义见 `rules/evolution.md`（MAJOR=破坏性，MINOR=新增，PATCH=澄清/修正）。
 
+## v1.9.0（2026-10-30）
+
+**技术栈设计边界补全：事务 / 异常 / 并发 / 越权 / 依赖（MINOR）**
+
+问题：除 `spring-boot-configuration.md`（1213 行）外，各技术栈规则只有 20-35 行纲要，
+而且多数是"结论口号"而非"判定标准"——例如 java.md 原第 9 条「事务边界由业务一致性决定」
+无法据以判断对错，Agent 和 reviewer 都用不上。补的方向统一是：**能判定的才写**。
+
+- `rules/java.md` 补 8 条（11-18）：依赖方向单向；`@Transactional` 只在 Service 层、
+  事务内禁调 HTTP/RPC/MQ（长事务持锁、打空连接池）；查询 `readOnly=true`；
+  自调用/private 方法上事务注解静默失效；禁 `new Thread` / `Executors.newXxx`；
+  禁 `static SimpleDateFormat`；异常日志必须带堆栈、禁 catch 后 return null；
+  集合返回空集合不返回 null。
+- `rules/security.md` 补 6 条（7-12）：**数据归属校验**（只校验"已登录"就是越权，
+  最常见也最易漏）、SSRF 白名单、禁反序列化不可信数据、上传限类型大小并隔离路径、
+  响应体脱敏、CORS 不与 credentials 同开。
+- `rules/python.md` 补 5 条（10-14）：依赖锁精确版本 + 虚拟环境、`async def` 内禁同步阻塞
+  （`requests`/`time.sleep` 会卡死事件循环）、资源用 `with`、环境变量集中读取、
+  公开函数必须有类型注解。
+- `rules/vue.md` 补 5 条（9-13）：组件不直连 axios（统一请求层）、props 超 5 个考虑拆分、
+  **请求竞态**（快速切筛选时旧响应覆盖新数据）、路由懒加载与长列表虚拟滚动、
+  权限不硬编码在模板里。
+- `rules/sqlserver.md` 补 3 条：分页必须带确定性 `ORDER BY`、索引列上禁套函数或隐式转换、
+  大表建索引评估 `ONLINE`。
+- `checks/catalog.tsv` 新增 3 条可机器判定的（其余属人工判定，进 `skills/code-review`
+  语义审查，不进机器门禁——硬塞进去必然误报）：`java-new-thread`（warning）、
+  `java-static-simpledateformat`（error）、`java-catch-return-null`（warning，仅单行 catch）。
+- **注意**：新增检查项属行为收紧，已有项目升级后可能出现新的 FAIL，属预期。
+  升级方式：`agency update` + `agency check --install <项目>`。
+
 ## v1.8.0（2026-10-30）
 
 **Code Review 闭环：会话内拦截 + 评审流程 + 9 条检查项（MINOR）**
