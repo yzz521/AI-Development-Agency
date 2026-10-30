@@ -315,6 +315,23 @@ hit_vue_any() {
   printf '%s' "$1" | grep -qE '(:[[:space:]]*any[^[:alnum:]_]|<any>|as[[:space:]]+any)'
 }
 
+# ---- Python ----
+# 裸 except：没有异常类型，连 KeyboardInterrupt / SystemExit 一起吞
+hit_py_bare_except() {
+  printf '%s' "$1" | grep -qE '^[[:space:]]*except[[:space:]]*:'
+}
+
+# 可变默认参数：默认值在函数定义时求值一次，所有调用共享同一实例
+# 用 [(] 与 [{][}] 而非 \( \{ \}：本机 grep 是 toybox，不支持 GNU 转义
+hit_py_mutable_default() {
+  printf '%s' "$1" | grep -qE 'def[[:space:]]+[[:alnum:]_]+[[:space:]]*[(].*=[[:space:]]*(\[\]|[{][}])'
+}
+
+# eval/exec 动态执行。排除 .eval( —— PyTorch 的 model.eval() 是标准写法，不是代码注入
+hit_py_eval_exec() {
+  printf '%s' "$1" | grep -qE '(^|[^.[:alnum:]_])(eval|exec)[[:space:]]*[(]'
+}
+
 run_engine() {
   local engine="$1" text="$2"
   case "$engine" in
@@ -336,6 +353,9 @@ run_engine() {
     java-magic-number) hit_java_magic_number "$text" ;;
     vue-options-api) hit_vue_options_api "$text" ;;
     vue-any) hit_vue_any "$text" ;;
+    py-bare-except) hit_py_bare_except "$text" ;;
+    py-mutable-default) hit_py_mutable_default "$text" ;;
+    py-eval-exec) hit_py_eval_exec "$text" ;;
     *) echo "未知 engine: $engine" >&2; return 1 ;;
   esac
 }

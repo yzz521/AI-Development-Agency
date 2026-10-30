@@ -20,3 +20,6 @@ vue-purple-gradient|on|warning|*.vue,*.css,*.scss,*.less|vue-purple-gradient|rul
 java-magic-number|off|warning|*.java,*.kt|java-magic-number|rules/java.md|疑似魔法值，改用常量类或 Enum（边界值场景多，默认关）
 vue-options-api|off|warning|*.vue|vue-options-api|rules/vue.md|使用 Options API，项目统一用 script setup 时可打开
 vue-any|off|warning|*.vue,*.ts,*.tsx|vue-any|rules/vue.md|使用 any，参数应为明确类型（类型声明与第三方桥接会误报，默认关）
+py-bare-except|on|error|*.py|py-bare-except|rules/python.md|裸 except 吞异常（含 KeyboardInterrupt），应指定异常类型或至少记日志
+py-mutable-default|on|error|*.py|py-mutable-default|rules/python.md|可变对象作默认参数，定义时求值一次、调用间共享同一实例
+py-eval-exec|on|warning|*.py|py-eval-exec|rules/python.md|eval/exec 动态执行，输入不可信时即代码注入（.eval() 方法调用已排除）
