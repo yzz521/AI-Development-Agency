@@ -2,6 +2,49 @@
 
 所有规则/规范变更记录于此。版本语义见 `rules/evolution.md`（MAJOR=破坏性，MINOR=新增，PATCH=澄清/修正）。
 
+## v2.1.0（2026-11-03）
+
+**code-review 增加技术栈规范逐条核对（MINOR）**
+
+问题：用户质疑「我想的是 review 的时候，为什么改的是 catalog.tsv + check.sh 这几个文件？
+code-review 对应 skill.md 不修改吗？」——v2.0.0 只加了语义维度和机器检查项，但
+**review 流程本身没有「按 Java/SQL/Vue 规范逐条核对」这个动作**：SKILL.md 第 4 步只有
+通用语义维度（正确性/事务/分层/结构/编码合理性…），code-reviewer 的必读清单里也没有
+`rules/java.md` / `rules/sqlserver.md` / `rules/vue.md`，报告模板更没有规范核对的记录位置。
+结果是 review 只跑 `agency check` + 凭经验看几眼，规则里写的东西大部分没被真正核对。
+
+- `skills/code-review/SKILL.md` 流程从 6 步扩展为 8 步，插入两个必做步骤：
+  **第 4 步「定技术栈 + 读规范全文」**——按 diff 文件扩展名映射到规则文件
+  （`*.java`/`*.kt`→`rules/java.md`、`*.sql`/`*Mapper.xml`→`rules/sqlserver.md`、
+  `*.vue`→`rules/vue.md`、`*.py`→`rules/python.md`，常驻 `rules/global.md` + `rules/security.md`），
+  **读全文而不是摘要**（摘要省略判定标准和例外条件，只看摘要审不出细节违规）；
+  **第 5 步「逐条核对规范」**——对每条规则给「符合 / 违反 / 不适用」结论，
+  违反必须带 `文件:行` 证据，并明确「不允许因为规则太多就只看机器检查结果」。
+  边界新增「不跳过规范核对」。
+- `agents/quality/code-reviewer.md` 必读清单增加第 8 项「按 diff 技术栈读取对应规则全文」；
+  工作方法从「第 0 步跑门禁 → 直接语义审查」改为「第 0 步门禁 → 第 1 步逐条核对规范
+  → 第 2 步通用语义审查」；硬性约束新增「必须读规则全文逐条核对」；
+  完成标准新增「diff 涉及技术栈的规则已逐条核对并给出结论」。
+- `artifacts/templates/code-review.md` 新增第 5 节「技术栈规范核对」
+  （5.1 核对范围表、5.2 违反项表、5.3 不适用项表、5.4 符合项汇总），
+  原第 5-7 节顺延为 6-8；检查清单新增「技术栈规范核对（review 主体，不可跳过）」三项勾选；
+  Decision 判据新增「规范核对发现阻塞级违反 → REQUEST_CHANGES」。
+- `checks/catalog.tsv` 新增 3 条辅助机器检查项（定位是**减少人工核对量**，不是替代 review）：
+  `java-log-getmessage`（on, warning）— 异常日志只打 `e.getMessage()` 丢掉堆栈，
+  两步法排除 `log.error(e.getMessage(), e)` 带异常对象的合规写法；
+  `vue-props-mutation`（on, warning）— `props.xxx =` 直接改 props，
+  用 `[^=]` 排除 `==` / `===` 比较；
+  `vue-template-role`（off, warning）— `v-if`/`v-else-if`/`v-show` 属性值里出现 `role`，
+  误报面略宽故默认关，项目按需打开。
+- `scripts/check.sh` 新增 `hit_java_log_getmessage`、`hit_vue_props_mutation`、
+  `hit_vue_template_role` 三个引擎函数并在 `run_engine` 注册。
+- `scripts/check-selftest.sh` 新增第 14-16 组用例，覆盖三个新检查项的命中与不误报两边。
+- 不做的候选（降级为逐条核对时的人工判断）：Vue 路由懒加载（写法多样，误报面宽）、
+  SQL LIMIT/OFFSET 无 ORDER BY（跨行判定，单行模式大量误报/漏报）、
+  SQL CREATE INDEX 无 ONLINE（多行 DDL，几乎全漏报）、
+  Java @Transactional 在 Controller（单行无法判断所在类）、
+  Java 依赖方向（需跨文件分析 import 图）、文件大小阈值（需统计整文件行数）。
+
 ## v2.0.0（2026-11-03）
 
 **代码审核维度增强：结构 / 位置 / 编码合理性（MAJOR）**

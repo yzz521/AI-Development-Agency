@@ -28,3 +28,6 @@ java-static-simpledateformat|on|error|*.java,*.kt|java-static-simpledateformat|r
 java-catch-return-null|on|warning|*.java,*.kt|java-catch-return-null|rules/java.md|catch 后 return null 掩盖失败，调用方无法区分"没数据"和"出错了"（单行 catch 才可判定，跨行会漏）
 vue-component-axios|on|warning|*.vue|vue-component-axios|rules/vue.md|组件内直接 import axios/fetch，应统一走项目请求层（拦截器负责 token/错误码/重试）
 py-async-sync-call|on|warning|*.py|py-async-sync-call|rules/python.md|async def 内调用同步阻塞库（requests/time.sleep），会卡死事件循环
+java-log-getmessage|on|warning|*.java,*.kt|java-log-getmessage|rules/java.md|异常日志只打 e.getMessage() 丢掉堆栈，应把异常对象作为最后一个参数传给日志框架
+vue-props-mutation|on|warning|*.vue|vue-props-mutation|rules/vue.md|直接给 props 成员赋值（props.xxx =），子组件不应修改 props
+vue-template-role|off|warning|*.vue|vue-template-role|rules/vue.md|模板内硬编码角色判断（v-if="role === 'admin'"），应走路由守卫或权限指令（误报面略宽，默认关）
