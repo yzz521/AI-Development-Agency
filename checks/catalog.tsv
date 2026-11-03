@@ -26,3 +26,5 @@ py-eval-exec|on|warning|*.py|py-eval-exec|rules/python.md|eval/exec 动态执行
 java-new-thread|on|warning|*.java,*.kt|java-new-thread|rules/java.md|new Thread / Executors.newXxx 自建线程，线程池应由容器注入并配置队列与拒绝策略
 java-static-simpledateformat|on|error|*.java,*.kt|java-static-simpledateformat|rules/java.md|static SimpleDateFormat 非线程安全，并发下会解析出错乱日期，改用 DateTimeFormatter
 java-catch-return-null|on|warning|*.java,*.kt|java-catch-return-null|rules/java.md|catch 后 return null 掩盖失败，调用方无法区分"没数据"和"出错了"（单行 catch 才可判定，跨行会漏）
+vue-component-axios|on|warning|*.vue|vue-component-axios|rules/vue.md|组件内直接 import axios/fetch，应统一走项目请求层（拦截器负责 token/错误码/重试）
+py-async-sync-call|on|warning|*.py|py-async-sync-call|rules/python.md|async def 内调用同步阻塞库（requests/time.sleep），会卡死事件循环

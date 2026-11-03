@@ -2,6 +2,42 @@
 
 所有规则/规范变更记录于此。版本语义见 `rules/evolution.md`（MAJOR=破坏性，MINOR=新增，PATCH=澄清/修正）。
 
+## v2.0.0（2026-11-03）
+
+**代码审核维度增强：结构 / 位置 / 编码合理性（MAJOR）**
+
+问题：用户反馈「希望能审核一下代码结构，位置，是否有编码不合理的地方？现在审核的不是太够」。
+当前 code-review 的语义审查维度（6 个）侧重正确性、事务、分层、异步四态、过度设计、规则 gap，
+对"代码结构合理性"、"文件位置/组织"、"编码合理性"三个维度覆盖不足或完全缺失。
+机器检查项（24 条）也没有"组件直连 axios"、"async 内同步阻塞"等可零歧义判定的项。
+
+本次是一次较大的审核维度扩展，按 `rules/evolution.md` 版本语义升 MAJOR。
+
+- `rules/global.md` 新增第 9-10 条：代码放正确位置（跟随已有目录结构）、编码合理性
+  （函数职责单一、重复逻辑提取但不提前抽象）。
+- `rules/java.md` 新增第 19-20 条：包结构跟随已有分层（controller/service/repository/domain/dto），
+  跨层类放独立包；单文件不超 500 行、单方法不超 80 行（人工参考阈值，非硬性门禁）。
+- `rules/vue.md` 新增第 14 条：组件文件放正确目录（views/pages → components → components/base），
+  单 .vue 文件不超 300 行。
+- `rules/python.md` 新增第 15 条：模块文件放正确目录（api/service/dao/ai 各归其位），
+  单 .py 文件不超 400 行。
+- `checks/catalog.tsv` 新增 2 条机器检查项：
+  `vue-component-axios`（on, warning）— 组件内直接 import axios/fetch，应走项目请求层；
+  `py-async-sync-call`（on, warning）— async def 内调用同步阻塞库（requests/time.sleep）。
+  另有 `java-transactional-controller` 候选项因单行增量模式无法零歧义判定所在类，未纳入机器检查，
+  改为语义审查维度覆盖。
+- `scripts/check.sh` 新增 `hit_vue_component_axios` 与 `hit_py_async_sync_call` 两个引擎函数，
+  并在 `run_engine` 中注册。
+- `skills/code-review/SKILL.md` 第 4 步语义审查从 6 个维度扩展为 9 个：
+  新增「代码结构与文件位置」「编码合理性」「安全与越权」。
+- `agents/quality/code-reviewer.md` 工作方法新增「代码结构与文件位置」「编码合理性」两个审查步骤，
+  并给出具体审查要点（目录/包/层级、文件大小阈值、命名、重复代码、嵌套层级、异常策略一致性）。
+- `artifacts/templates/code-review.md` 语义审查小节从 5 个扩展为 8 个：
+  新增 5.4 代码结构与文件位置、5.5 编码合理性、5.8 安全与越权；
+  检查清单同步新增 3 个勾选项。
+- **注意**：新增检查项属行为收紧，已有项目升级后可能出现新的 FAIL（vue-component-axios、
+  py-async-sync-call），属预期。升级方式：`agency update` + `agency check --install <项目>`。
+
 ## v1.9.0（2026-10-30）
 
 **技术栈设计边界补全：事务 / 异常 / 并发 / 越权 / 依赖（MINOR）**

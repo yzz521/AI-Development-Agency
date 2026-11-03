@@ -37,8 +37,11 @@ description: >
    - 正确性与边界（空值、越界、并发、幂等）
    - 事务边界与数据一致性（`rules/java.md`）
    - 分层职责（Controller 是否堆了业务逻辑）
+   - **代码结构与文件位置**（新增代码是否放在正确目录/包/层级；文件大小是否超出参考阈值；职责是否单一）
    - 异步四态（loading / empty / error / retry，`rules/vue.md`）
+   - **编码合理性**（命名是否达意、重复代码块、嵌套层级过深、异常处理策略是否一致）
    - 过度设计（联动 `skills/diff-review`）
+   - **安全与越权**（数据归属校验、敏感信息泄露、SSRF/CORS 配置）
    - 规则 gap（无规则覆盖的新情况 → 记 `rule_gap` 反馈）
 
 5. **写报告**：按 `artifacts/templates/code-review.md` 产出 `code-review.md`。

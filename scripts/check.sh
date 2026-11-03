@@ -349,6 +349,19 @@ hit_java_catch_return_null() {
   printf '%s' "$1" | grep -qE 'catch[[:space:]]*[(][^)]*[)][^}]*return[[:space:]]+null'
 }
 
+# 组件内直接 import axios/fetch：应统一走项目请求层
+hit_vue_component_axios() {
+  printf '%s' "$1" | grep -qE '^import[[:space:]]+.*[[:space:]]from[[:space:]]+.(axios|node-fetch|cross-fetch).'
+}
+
+# async def 内同步阻塞调用：requests/time.sleep 会卡死事件循环
+# 只判同一行内同时出现 async def 和同步阻塞调用的情况
+hit_py_async_sync_call() {
+  printf '%s' "$1" | grep -qE 'async[[:space:]]+def[[:space:]]+' || return 1
+  printf '%s' "$1" | grep -qE '(requests\.(get|post|put|delete|patch|head|request)|time\.sleep)' && return 0
+  return 1
+}
+
 run_engine() {
   local engine="$1" text="$2"
   case "$engine" in
@@ -376,6 +389,8 @@ run_engine() {
     java-new-thread) hit_java_new_thread "$text" ;;
     java-static-simpledateformat) hit_java_static_simpledateformat "$text" ;;
     java-catch-return-null) hit_java_catch_return_null "$text" ;;
+    vue-component-axios) hit_vue_component_axios "$text" ;;
+    py-async-sync-call) hit_py_async_sync_call "$text" ;;
     *) echo "未知 engine: $engine" >&2; return 1 ;;
   esac
 }
