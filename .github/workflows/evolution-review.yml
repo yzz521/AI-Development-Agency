@@ -1,0 +1,40 @@
+name: evolution-review
+
+on:
+  schedule:
+    - cron: "17 2 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  summarize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build evolution report
+        run: bash scripts/evolve.sh --days 30 --output "$RUNNER_TEMP/evolution-review.md"
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: evolution-review-${{ github.run_id }}
+          path: ${{ runner.temp }}/evolution-review.md
+          retention-days: 30
+      - name: Open review issue when threshold is reached
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if grep -q 'ACTION_REQUIRED=true' "$RUNNER_TEMP/evolution-review.md"; then
+            existing="$(gh issue list --state open --search '"Agency evolution review"' --json number --jq 'length')"
+            if [ "$existing" = "0" ]; then
+              gh issue create \
+                --title "Agency evolution review — $(date -u +%F)" \
+                --body-file "$RUNNER_TEMP/evolution-review.md"
+            else
+              echo "An open evolution review issue already exists; skipping duplicate."
+            fi
+          else
+            echo "Feedback threshold not reached; no issue created."
+          fi
