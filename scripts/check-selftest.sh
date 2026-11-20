@@ -127,4 +127,34 @@ rm -rf "$proj"
 assert_has /tmp/agency-check-out.txt 'java-map-object'
 assert_has /tmp/agency-check-out.txt 'java-pathvariable'
 
+# 14) 异常日志只打 e.getMessage() → FAIL；带异常对象 → PASS
+# 注意用 HEAD 恢复：第 9 步把 Map 违规 add 进了 index，`checkout -- <file>` 会从 index 取
+git -C "$tmp" checkout -q HEAD -- src/Ok.java
+printf '%s\n' 'package demo;' 'class C { void a(Exception e) { log.error(e.getMessage()); } }' > "$tmp/src/Ok.java"
+assert_fail "$CHECK" --dir "$tmp"
+assert_has /tmp/agency-check-out.txt 'java-log-getmessage'
+printf '%s\n' 'package demo;' 'class C { void a(Exception e) { log.error(e.getMessage(), e); } }' > "$tmp/src/Ok.java"
+assert_pass "$CHECK" --dir "$tmp"
+# 不含 getMessage 的日志不命中
+printf '%s\n' 'package demo;' 'class C { void a(Exception e) { log.error("failed", e); } }' > "$tmp/src/Ok.java"
+assert_pass "$CHECK" --dir "$tmp"
+
+# 15) 直接给 props 赋值 → FAIL；比较/解构 → PASS
+git -C "$tmp" checkout -q HEAD -- src/Ok.java
+printf '%s\n' '<script setup>' 'props.title = "new"' '</script>' > "$tmp/src/Ok.vue"
+assert_fail "$CHECK" --dir "$tmp"
+assert_has /tmp/agency-check-out.txt 'vue-props-mutation'
+printf '%s\n' '<script setup>' 'if (props.title === oldTitle) return' 'const { title } = props' '</script>' > "$tmp/src/Ok.vue"
+assert_pass "$CHECK" --dir "$tmp"
+
+# 16) 模板内角色硬编码：默认 off → PASS；--enable → FAIL
+printf '%s\n' '<template><div v-if="role === '"'"'admin'"'"'">x</div></template>' > "$tmp/src/Ok.vue"
+assert_pass "$CHECK" --dir "$tmp"
+assert_fail "$CHECK" --dir "$tmp" --enable vue-template-role
+assert_has /tmp/agency-check-out.txt 'vue-template-role'
+# 已抽成计算属性的写法不命中
+printf '%s\n' '<template><div v-if="isAdmin">x</div></template>' > "$tmp/src/Ok.vue"
+assert_pass "$CHECK" --dir "$tmp" --enable vue-template-role
+rm -f "$tmp/src/Ok.vue"
+
 echo "check-selftest OK"

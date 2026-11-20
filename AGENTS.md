@@ -1,4 +1,4 @@
-# AI Development Agency — 总控规则 v1.9.0
+# AI Development Agency — 总控规则 v2.1.0
 
 ## 1. 项目定位
 

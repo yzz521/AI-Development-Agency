@@ -10,6 +10,7 @@
 - 分页与权限走项目既有模式，不另起一套。
 - 依赖方向单向（Controller → Service → Repository）；`@Transactional` 只在 Service 层，事务内不调外部服务。
 - 禁止 `new Thread` / `Executors.newXxx` / `static SimpleDateFormat`；异常日志带堆栈，不 catch 后返回 null。
+- 包结构跟随已有分层（controller/service/repository/domain/dto）；单文件不超 500 行、单方法不超 80 行，超出考虑拆分职责。
 
 ## 必须遵守
 
@@ -36,6 +37,12 @@
 17. 异常日志必须带堆栈，禁止只打 `e.getMessage()`（丢掉堆栈等于放弃排查）。
     禁止 catch 后返回 `null` 或空对象掩盖失败。
 18. 集合返回值用空集合，不返回 `null`（调用方少一次判空，也少一次 NPE）。
+19. 包结构跟随项目既有分层：`controller` / `service` / `repository`（或 `mapper`）/ `domain`（或 `entity`）
+    / `dto`（或 `vo`/`command`/`query`）。新增类放入对应层级的包，不在错误层级创建类
+    （如 Controller 放进 `service` 包、DTO 放进 `controller` 包）。
+    跨层类（如 `util`/`config`/`exception`）放在独立包，不与业务层混放。
+20. 单个 Java 文件不超过 500 行（不含 import 和注释）；单个方法不超过 80 行。
+    超过时优先考虑拆分职责，而非单纯拆文件。此为人工审查参考阈值，不做硬性机器门禁。
 
 ## 代码质量
 

@@ -349,6 +349,39 @@ hit_java_catch_return_null() {
   printf '%s' "$1" | grep -qE 'catch[[:space:]]*[(][^)]*[)][^}]*return[[:space:]]+null'
 }
 
+# 组件内直接 import axios/fetch：应统一走项目请求层
+hit_vue_component_axios() {
+  printf '%s' "$1" | grep -qE '^import[[:space:]]+.*[[:space:]]from[[:space:]]+.(axios|node-fetch|cross-fetch).'
+}
+
+# async def 内同步阻塞调用：requests/time.sleep 会卡死事件循环
+# 只判同一行内同时出现 async def 和同步阻塞调用的情况
+hit_py_async_sync_call() {
+  printf '%s' "$1" | grep -qE 'async[[:space:]]+def[[:space:]]+' || return 1
+  printf '%s' "$1" | grep -qE '(requests\.(get|post|put|delete|patch|head|request)|time\.sleep)' && return 0
+  return 1
+}
+
+# 异常日志只打 e.getMessage()：丢掉堆栈，排查时看不到出错位置
+# 两步法：先确认是日志调用里带 e.getMessage()，再排除把异常对象当最后参数传入的合规写法
+hit_java_log_getmessage() {
+  printf '%s' "$1" | grep -qE 'log\.(info|debug|warn|error|trace)[[:space:]]*\(.*\.getMessage[[:space:]]*\([[:space:]]*\)' || return 1
+  printf '%s' "$1" | grep -qE ',[[:space:]]*(e|ex|ex[0-9]|exception|throwable)[[:space:]]*\)' && return 1
+  return 0
+}
+
+# 直接给 props 成员赋值：子组件改 props 会触发 Vue 警告，且父组件重渲染后修改丢失
+# 只判直接赋值；props.xxx.push() 这类间接修改判不出来（宁可漏报不误报）
+hit_vue_props_mutation() {
+  printf '%s' "$1" | grep -qE '(^|[^[:alnum:]_.])props\.[[:alnum:]_]+[[:space:]]*=[^=]'
+}
+
+# 模板内硬编码角色判断：权限应走路由守卫或权限指令
+# 只判 v-if/v-else-if/v-show 属性值里出现 role 的情况；v-if="isAdmin" 这类已抽成计算属性的写法不命中
+hit_vue_template_role() {
+  printf '%s' "$1" | grep -qE 'v-(if|else-if|show)="[^"]*role'
+}
+
 run_engine() {
   local engine="$1" text="$2"
   case "$engine" in
@@ -376,6 +409,11 @@ run_engine() {
     java-new-thread) hit_java_new_thread "$text" ;;
     java-static-simpledateformat) hit_java_static_simpledateformat "$text" ;;
     java-catch-return-null) hit_java_catch_return_null "$text" ;;
+    vue-component-axios) hit_vue_component_axios "$text" ;;
+    py-async-sync-call) hit_py_async_sync_call "$text" ;;
+    java-log-getmessage) hit_java_log_getmessage "$text" ;;
+    vue-props-mutation) hit_vue_props_mutation "$text" ;;
+    vue-template-role) hit_vue_template_role "$text" ;;
     *) echo "未知 engine: $engine" >&2; return 1 ;;
   esac
 }
