@@ -327,7 +327,7 @@
 5. 关键逻辑必须有可验证路径；数据与日志最小必要。
 6. 有意简化必须 `agency: <上限>, <升级路径>` 留痕。
 7. 汇报按风险：L1 三行（改了什么 / 怎么验证 / 风险）；L2 短汇报；L3 用 §7 完整表。用户未要求讲解时不要把 L1 写成 L3。
-8. 规范库自身发现规则缺口/过时/违反时必须 `agency feedback` 并在该升级时提案。业务仓库只在同样情况写反馈，不要为走流程写 `rule_applied`。
+8. 每个任务收尾时按 `skills/agency-feedback/SKILL.md` 自动检查真实规则缺口/过时/违反及 Workflow / Context 问题；发现问题由 Agent 自行调用 `agency feedback` 落盘，不要求用户手动输入。没有问题不写反馈；CLI/权限不可用时如实说明未落盘。达到阈值后由 `agency evolve` 和定时工作流汇总，Curator 核验证据并通过 PR 提交变更，不自动合并。
 9. 提交信息用 Conventional Commits（`type(scope): 摘要`）；功能与修复走独立分支和 PR，禁止直推 `main`/`master`。细则见 `rules/git.md`。
 
 Map / 魔法值 / 业务 PathVariable 等见 Java 条件加载摘要。数据库迁移见 SQL 摘要。医疗口径见医疗摘要。Git 细则按任务关键词加载 `rules/git.md`。
