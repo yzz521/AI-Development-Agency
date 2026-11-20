@@ -451,7 +451,7 @@ $PIN_BEGIN
 2. 只加载命中规则的摘要；**写代码时**命中的语言/领域规则必须再打开文内「原文路径」（摘要会丢掉约束）。探测任务 \`opened=none\`。
 3. 回复第一行：
    \`agency-route: matched=<id,id> risk=L2 rules=rules/java.md opened=rules/java.md source=agents.md\`
-4. 常驻红线：先读再改；最小改动；密钥不进源码；SQL 参数化。
+4. 常驻红线：先读再改；最小改动；回答先结论、表达直接清楚；密钥不进源码；SQL 参数化。
 5. 汇报：L1 三行；L2 短汇报；L3 完整表。业务仓无规则缺口则不写 feedback。
 6. 强制靠 \`agency check\`（只卡增量）。存量用 \`agency check --all\` 做台账，不进 hook。
 $PIN_END
