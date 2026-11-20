@@ -1,7 +1,7 @@
 # AI Development Agency
 
 > 面向企业软件研发的 AI 虚拟研发团队规范库。  
-> 当前版本：**v2.3.0**
+> 当前版本：**v2.3.1**
 
 AI Development Agency 不是新的 AI Coding Runtime，也不是把多个 Agent 强行绑定在一起的框架。
 
@@ -45,7 +45,7 @@ AI Development Agency 不是新的 AI Coding Runtime，也不是把多个 Agent 
 
 ## 沟通规则与个人偏好
 
-- `rules/communication.md`：常驻表达规则，先结论、少废话、语言清楚，并按任务复杂度控制长度。
+- `rules/communication.md`：常驻表达规则，先结论、少废话、语言清楚；定义类简单问题默认 1—3 句话，再按任务复杂度展开。
 - `profiles/default.md`：可选的个人沟通偏好，只在用户主动配置或加载后生效。
 - 各工具的全局配置机制不同，接入边界见 `adapters/global-preferences.md`。仓库文件不会自动改变 ChatGPT 等独立会话的行为。
 
