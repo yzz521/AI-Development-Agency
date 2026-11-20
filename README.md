@@ -1,7 +1,7 @@
 # AI Development Agency
 
 > 面向企业软件研发的 AI 虚拟研发团队规范库。  
-> 当前版本：**v2.2.0**
+> 当前版本：**v2.3.0**
 
 AI Development Agency 不是新的 AI Coding Runtime，也不是把多个 Agent 强行绑定在一起的框架。
 
@@ -19,6 +19,7 @@ AI Development Agency 不是新的 AI Coding Runtime，也不是把多个 Agent 
 | Context   | 在什么背景下做 | `context/`            |
 | Evolution | 怎么进化       | `evolution/` + `rules/evolution.md` |
 | Skill     | 轻量场景即调即走 | `skills/`            |
+| Profile   | 用户主动加载的个人偏好 | `profiles/` |
 
 核心关系：
 
@@ -39,6 +40,12 @@ AI Development Agency 不是新的 AI Coding Runtime，也不是把多个 Agent 
 ```
 
 所以本仓库不是简单的 Prompt 集合，而是一套可复用的 AI 研发角色与研发流程规范。
+
+## 沟通规则与个人偏好
+
+- `rules/communication.md`：常驻表达规则，先结论、少废话、语言清楚，并按任务复杂度控制长度。
+- `profiles/default.md`：可选的个人沟通偏好，只在用户主动配置或加载后生效。
+- 各工具的全局配置机制不同，接入边界见 `adapters/global-preferences.md`。仓库文件不会自动改变 ChatGPT 等独立会话的行为。
 
 ## 2. 重要边界
 
@@ -92,6 +99,7 @@ AI-Development-Agency/
 ├── routes/                   # 任务/文件 → 规范 的单一路由表
 ├── checks/                   # 增量门禁规则表（catalog.tsv）
 ├── skills/                   # 场景技能层（agency-route / agency-check / git-commit）
+├── profiles/                 # 可选个人偏好配置（不作为团队强制规则）
 ├── scripts/                  # 工具链：agency CLI + 初始化 / 校验 / 进化脚本
 ├── templates/                # 项目 AGENTS.md / hook / CI / 提案等模板
 ├── docs/                     # 使用手册、规则清单、批量初始化、团队推广方案、载体归属迁移清单
