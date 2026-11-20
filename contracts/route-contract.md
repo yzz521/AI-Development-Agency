@@ -12,8 +12,9 @@ routes/table.tsv
 
 工具侧适配（生成物，禁止手改后当真相）：
 
+- 项目 `AGENTS.md` 文首 `<!-- agency-pin:begin -->` … `<!-- agency-pin:end -->`（最短总控，防截断）
 - 项目 `AGENTS.md` 中 `<!-- agency-router:begin -->` … `<!-- agency-router:end -->`
-- `.cursor/rules/agency-router.mdc`
+- `.cursor/rules/agency-router.mdc`（钉死段 + 路由摘要，alwaysApply）
 - `templates/project-AGENTS.md` 同名段
 - `templates/cursor-rules/agency-router.mdc`
 
@@ -37,6 +38,16 @@ agency route --install <项目目录>    # 业务仓库，按技术栈裁剪摘�
 
 上下文里放规则文件的 `## 摘要（注入用）`，并保留原文路径。
 禁止默认整篇注入 `rules/backend/java/spring-boot-configuration.md` 这类长文。
+**写代码时**命中的语言/领域规则必须再打开原文；探测可只看摘要。
+
+## 回执
+
+```text
+agency-route: matched=<ids> risk=L2 rules=<paths> opened=<paths|none> source=<skill|agents.md|mdc|cli>
+```
+
+- `opened=`：本会话真实打开过的规则原文。探测允许 `none`。
+- CLI：`opened=suggest:<paths>` 表示建议打开，不能当作已读。
 
 ## 触发形态
 

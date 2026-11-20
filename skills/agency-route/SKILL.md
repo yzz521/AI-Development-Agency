@@ -7,7 +7,8 @@ description: >
   page, component, SQL, YAML config, or bug. Also use when the user mentions
   规范, 按规范写, 路由, agency, 医保, DRG, Java, Vue, React, Python.
   Do NOT require the user to run agency CLI. Read the routing table and
-  摘要（注入用）yourself. Also use when the user asks 有没有触发, 命中哪些规则,
+  摘要（注入用）yourself; when writing code, also open the original rule
+  file listed as 原文路径. Also use when the user asks 有没有触发, 命中哪些规则,
   路由探测, 这次用了哪条规范. Do NOT use for non-coding chat, translation, or
   general knowledge.
 ---
@@ -34,8 +35,9 @@ description: >
    - 没有文件也没有关键词时：按项目技术栈回退（`pom.xml` → Java 等）
 3. **注入摘要，不注入全文**
    - 打开命中规则文件的 `## 摘要（注入用）` 小节
-   - 项目 `AGENTS.md` 路由段里若已内嵌摘要，直接用，不要再整篇读原文
-   - 摘要不够再读原文；未命中的语言规范不要加载
+   - 项目 `AGENTS.md` 路由段里若已内嵌摘要，探测任务可直接用
+   - **写代码 / 改代码时**：命中的语言或领域规则必须再打开「原文路径」指向的文件（摘要会丢掉约束）。always 三件套（global / minimalism / security）已在钉死段和路由摘要里，不必每次打开全文
+   - 未命中的语言规范不要加载
 4. **可选确认**（有 CLI 才用，没有就跳过）
    - `agency route --task "<用户原话>" --files <已知文件>`
    - 不得因为 CLI 不在 PATH 而中断任务，也不得让用户去记这条命令
@@ -56,14 +58,21 @@ description: >
 写代码时，回复的**第一行**必须是这条可 grep 的回执，然后立刻动手（不要再解释将使用哪个 Agent）：
 
 ```text
-agency-route: matched=<id,id> risk=<L1|L2|L3> rules=<paths> source=<skill|agents.md|mdc|cli>
+agency-route: matched=<id,id> risk=<L1|L2|L3> rules=<paths> opened=<paths|none> source=<skill|agents.md|mdc|cli>
 ```
 
-例子：
+例子（写 Java 接口，已打开 java 原文）：
 
 ```text
-agency-route: matched=core,java risk=L2 rules=rules/global.md,rules/java.md source=skill
+agency-route: matched=core,java risk=L2 rules=rules/global.md,rules/java.md opened=rules/java.md source=skill
 ```
 
-`source` 取你实际用的通道：技能 / 项目 AGENTS.md 路由段 / Cursor mdc / 跑了 `agency route`。
-没有命中语言规则时 `matched` 仍应包含 `core`。编造未读过的 rules 路径视为假回执。
+探测（不改代码）可以：
+
+```text
+agency-route: matched=core,java risk=L2 rules=rules/java.md opened=none source=skill
+```
+
+`opened=` 只填本会话真实打开过的规则原文路径（可用 `.ai/agency/rules/...`）。`none` 仅允许探测。把没读过的路径写进 `opened=` 视为假回执。
+`source` 取你实际用的通道。没有命中语言规则时 `matched` 仍应包含 `core`。
+CLI 检查器会打印 `opened=suggest:<paths>`，那是建议打开的文件，不是已读证明。

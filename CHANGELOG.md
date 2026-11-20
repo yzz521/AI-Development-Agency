@@ -2,6 +2,19 @@
 
 所有规则/规范变更记录于此。版本语义见 `rules/evolution.md`（MAJOR=破坏性，MINOR=新增，PATCH=澄清/修正）。
 
+## v2.2.0（2026-11-20）
+
+**弹性汇报 + 文首钉死总控 + opened= 可核验（MINOR）**
+
+合入 `cursor/elastic-report-and-route-pin-cb70` 分支（该分支原标 v1.7.0，与主线 v1.7.0 撞号；主线已到 v2.1.0，合入后顺延为本版）：
+
+- 汇报按风险：L1 三行、L2 短汇报、L3 完整表。业务仓无规则缺口不写 `rule_applied` 走流程。
+- `AGENTS.md` 文首钉死最短总控（`<!-- agency-pin:begin -->`），`--install` / `--refresh-docs` 写入；防长文被截断后路由整段消失。
+- 写代码回执增加 `opened=`：必须是本会话打开过的语言/领域原文；探测 `opened=none`。CLI 打印 `opened=suggest:`。
+- 存量：保持增量门禁；手册 §2.4 规定用 `agency check --all` 按月出台账，不按库龄自动 FAIL，不把 `--all` 接进 hook/CI。
+- `scripts/route.sh` 的 `upsert_marked_section` 支持自定义标记对供 pin 段复用；CLI 回执打印 `opened=suggest:`。
+- 不预先堆框架写代码技能。DeepSeek Harness 自动入口本版不做。
+
 ## v2.1.0（2026-11-03）
 
 **code-review 增加技术栈规范逐条核对（MINOR）**
@@ -182,7 +195,6 @@ code-review 对应 skill.md 不修改吗？」——v2.0.0 只加了语义维度
 - 新增技能 `git-commit`（提交/分支/PR 时加载）；`agency route --install` 写入 `.agents/skills/git-commit`。
 - 新增 `templates/githooks/commit-msg`；`agency check --install` 一并写入 `.githooks/commit-msg`。
 - 总控 §6 增加提交/分支红线；路由表 `keyword|git`（`stack=any`，所有项目都注入摘要）。
-
 ## v1.6.0（2026-09-03）
 
 **增量规范门禁：只卡 diff，不卡存量（MINOR）**

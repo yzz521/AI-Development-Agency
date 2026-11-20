@@ -56,6 +56,17 @@ agency check --list [dir]          # 列出检查项及当前开关
 - 改到「本来就违规」的旧行、但没有新增多余违规 → **不拦**。
 - `--all` 才扫整文件，用于债务台账，不作为 hook/CI 默认。
 
+## 存量治理（与门禁分开）
+
+增量门禁**不**按库龄自动 FAIL。存量另开节奏：
+
+1. 每月（或每个迭代）在业务仓跑一次：`agency check --all 2>&1 | tee agency-stock-YYYYMM.log`
+2. 把命中按模块记入台账（文件、检查 id、是否本迭代清），不要把 log 当 hook。
+3. 清理走普通 PR，清一块少一块；未清的继续留在台账。
+4. 禁止为了「看起来干净」把 `--all` 接到 pre-commit / CI。
+
+`agency debt` 收割的是 `agency:` 简化留痕，和本表的机检存量不是同一件事。
+
 ## 跳过
 
 - `import` / `package` 行（java-map-object、java-fqcn）

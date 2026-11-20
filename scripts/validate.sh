@@ -138,6 +138,7 @@ else
   fail "缺少 routes/table.tsv"
 fi
 grep -q 'agency-router:begin' AGENTS.md && ok "AGENTS.md 含路由段标记" || fail "AGENTS.md 缺 agency-router 标记"
+grep -q 'agency-pin:begin' AGENTS.md && ok "AGENTS.md 含钉死段标记" || fail "AGENTS.md 缺 agency-pin 标记"
 [ -f skills/agency-route/SKILL.md ] && ok "skills/agency-route" || fail "缺少 agency-route 技能"
 [ -f skills/git-commit/SKILL.md ] && ok "skills/git-commit" || fail "缺少 git-commit 技能"
 grep -q '^name: git-commit$' skills/git-commit/SKILL.md && ok "git-commit frontmatter" || fail "git-commit 缺 name frontmatter"

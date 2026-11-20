@@ -6,7 +6,7 @@
 
 ```text
 使用（执行任务）
-   ↓ 任务完成后按 AGENTS.md 硬规则记录反馈
+   ↓ 发现缺口/过时/违反时记录反馈（不是每次都写）
 反馈（evolution/feedback/）
    ↓ 反馈累积 / 直接提案
 提案（evolution/proposals/）
@@ -20,7 +20,17 @@
 
 ## 2. 反馈采集（采集层）
 
-任何 Agent 完成任务后，必须对照 `rules/global.md` 与所用 Rule 自检，并按 `agency feedback` 记录反馈。反馈类型：
+任何 Agent 完成任务后，必须对照所用 Rule 自检。**不是每次都要写 feedback。**
+
+| 场景 | 要不要 `agency feedback` |
+| --- | --- |
+| 发现规则缺口 / 过时 / 存在但没被遵守 | **必须写**（`rule_gap` / `rule_stale` / `rule_violated`） |
+| workflow / context 缺失或不适配 | **必须写** |
+| 规范库自身任务且发现上述问题 | **必须写**，并在该升级时 `agency propose` |
+| 业务仓一次顺利的 L1/L2 改动 | **不要写** `rule_applied` 走流程 |
+| `rule_applied` | 可选，仅当需要留正面证据时 |
+
+kind 取值：
 
 | kind | 含义 | 价值 |
 | --- | --- | --- |

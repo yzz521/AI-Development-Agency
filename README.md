@@ -1,7 +1,7 @@
 # AI Development Agency
 
 > 面向企业软件研发的 AI 虚拟研发团队规范库。  
-> 当前版本：**v2.1.0**
+> 当前版本：**v2.2.0**
 
 AI Development Agency 不是新的 AI Coding Runtime，也不是把多个 Agent 强行绑定在一起的框架。
 
@@ -121,7 +121,7 @@ agency check --install ~/workspace/你的项目
 # 5) 随时自查接入状态：AGENTS.md / 技能 / 门禁 / hook 哪项缺一目了然
 agency status ~/workspace/你的项目
 
-# 6) 收工：记录规则使用反馈（自进化的起点）
+# 6) 有规则缺口/过时/违反时才记反馈（不要每次 rule_applied 走流程；自进化的起点）
 agency feedback --kind rule_gap --detail "遇到的问题"
 ```
 

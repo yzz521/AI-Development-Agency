@@ -8,8 +8,8 @@ Cursor 负责执行；Agency 负责规范。用户直接下任务，**不必先�
 
 | 层 | 文件 | 作用 |
 | --- | --- | --- |
-| 常驻 | 根目录 `AGENTS.md` 规范路由段 | Cursor 自动读 |
-| 常驻 | `.cursor/rules/agency-router.mdc`（`alwaysApply: true`） | 每轮注入压缩摘要 |
+| 常驻 | 根目录 `AGENTS.md` 文首钉死段 + 规范路由段 | 截断时仍能看到最短总控 |
+| 常驻 | `.cursor/rules/agency-router.mdc`（`alwaysApply: true`） | 钉死段 + 压缩摘要 |
 | 按任务 | `.agents/skills/agency-route/` | description 匹配写代码任务 |
 | 会话内拦截 | `.cursor/hooks.json` + `.cursor/hooks/agency-stop.sh` | Agent 想结束时跑增量门禁，有 FAIL 就拽回来 |
 
@@ -56,7 +56,7 @@ trusted workspace 中生效，路径相对项目根（`.cursor/hooks/xxx.sh`，�
 
 - 不要把 31 个 Agent Prompt 复制进 `.cursor/agents/`。
 - 不要把 `rules/` 全文 alwaysApply。
-- 语言细则按路由命中加载摘要；原文仍在 `.ai/agency/rules/`。
+- 语言细则：写代码时打开命中规则原文（`opened=`）；摘要只负责触发。强制层仍是 `agency check`。
 
 ## 与 CLI 的关系
 
