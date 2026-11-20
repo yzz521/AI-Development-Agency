@@ -1,4 +1,4 @@
-# AI Development Agency — 总控规则 v2.3.1
+# AI Development Agency — 总控规则 v2.4.0
 
 <!-- agency-pin:begin -->
 ## 写代码前（钉死，勿删）
@@ -59,7 +59,7 @@
 9. 运行 `agency check`（增量门禁），`result=PASS` 才能收尾；L2 至少一次 Code Review，L3 必须 Code Review + Security Review。
    机器覆盖不到的语义问题（正确性、事务边界、异步四态、过度设计）走 `skills/code-review`，产出 `code-review.md`。
 10. 汇总最终结果。
-11. 发现规则缺口/过时/违反时按 `rules/evolution.md` 记录反馈并提案。顺利的 L1/L2 不要为走流程写 feedback。
+11. 每个任务收尾时按 `skills/agency-feedback/SKILL.md` 自动检查规则缺口/过时/违反、Workflow 与 Context 问题；发现真实问题，由 Agent 自行运行 `agency feedback` 落盘，不要求用户手动输入命令。没有问题不写 feedback。达到阈值后由 `agency evolve` / 定时工作流汇总，Curator 核验证据并准备 PR；不自动合并。
 
 ## 4. Agent 路由
 
