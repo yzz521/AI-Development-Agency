@@ -37,10 +37,12 @@ ref_ok() {
 echo "== 校验规范库：$AGENCY_ROOT =="
 
 # 1. 结构完整性
-for d in agents rules workflows context contracts artifacts validation evolution templates scripts routes skills checks; do
+for d in agents rules workflows context contracts artifacts validation evolution templates scripts routes skills checks profiles; do
   [ -d "$d" ] && ok "目录 $d/" || fail "缺少目录 $d/"
 done
 [ -f AGENTS.md ] && ok "AGENTS.md" || fail "缺少 AGENTS.md"
+[ -f profiles/default.md ] && ok "profiles/default.md" || fail "缺少 profiles/default.md"
+[ -f rules/communication.md ] && ok "rules/communication.md" || fail "缺少 rules/communication.md"
 [ -f CHANGELOG.md ] && ok "CHANGELOG.md" || fail "缺少 CHANGELOG.md"
 
 # 2. Agent 必读引用可解析
@@ -137,6 +139,7 @@ if [ -f routes/table.tsv ]; then
 else
   fail "缺少 routes/table.tsv"
 fi
+grep -q '^always|core|||.*rules/communication.md' routes/table.tsv && ok "communication 常驻路由" || fail "communication 未加入 always 路由"
 grep -q 'agency-router:begin' AGENTS.md && ok "AGENTS.md 含路由段标记" || fail "AGENTS.md 缺 agency-router 标记"
 grep -q 'agency-pin:begin' AGENTS.md && ok "AGENTS.md 含钉死段标记" || fail "AGENTS.md 缺 agency-pin 标记"
 [ -f skills/agency-route/SKILL.md ] && ok "skills/agency-route" || fail "缺少 agency-route 技能"

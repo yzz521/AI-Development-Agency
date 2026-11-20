@@ -54,6 +54,10 @@ AI Development Agency
 **关键结论：强制力来自 `agency check` + git hook + CI，与平台无关。**
 Cursor 的 stop hook 只是“少一次提交往返”的增益，不是必需项——没有它，门禁照样在提交和合入时生效。
 
+## 全局沟通偏好
+
+Agency 的常驻表达规则由 `rules/communication.md` 提供，并随项目路由加载。个人偏好单独放在 `profiles/default.md`，需要用户主动配置到工具支持的用户级指令中。不要把个人偏好变成团队强制规则，也不要假设项目 `AGENTS.md` 能影响未加载 Agency 的独立会话。接入边界见 [global-preferences.md](global-preferences.md)。
+
 ## 各平台怎么用
 
 | 平台 | 规范注入 | 门禁怎么触发 | 详见 |

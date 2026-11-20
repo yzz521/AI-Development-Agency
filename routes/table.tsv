@@ -8,7 +8,7 @@
 # stack: java|vue|react|python|sqlserver|ai|healthcare|any；install 按项目裁剪摘要
 # hint: 摘要读不到时的一行压缩，禁止含竖线 |
 #
-always|core|||rules/global.md,rules/minimalism.md,rules/security.md|||any|先理解再改；最小变更；简化留痕；密钥不进代码；输入不可信；SQL 参数化
+always|core|||rules/global.md,rules/minimalism.md,rules/security.md,rules/communication.md|||any|先理解再改；最小变更；表达直接清楚；先结论后依据；密钥不进代码；输入不可信；SQL 参数化
 file|java|*.java,*.kt|java-developer|rules/java.md|workflows/backend-development.md|L2|java|Controller 收完整 DTO；禁业务 PathVariable；禁 Map；禁魔法值
 file|spring-boot|application*.yml,application*.yaml,application*.properties,*ConfigurationProperties.java|java-developer|rules/backend/java/spring-boot-configuration.md|workflows/backend-development.md|L2|java|YAML kebab-case；Duration；Mock 默认关闭；示例前缀 app
 file|vue|*.vue|vue-developer|rules/vue.md|workflows/frontend-development.md|L2|vue|跟随项目 Vue 写法；禁 any；异步四态；复用项目已有组件与 UI 库

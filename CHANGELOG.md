@@ -1,5 +1,16 @@
 # Changelog
 
+## v2.3.0（2026-11-20）
+
+**沟通规则与个人偏好分层（MINOR）**
+
+- 新增 `rules/communication.md`，进入 always 路由：回答先结论、减少套话与重复、使用易懂语言，并按任务复杂度控制输出长度。
+- 新增 `profiles/default.md`，保存可选的个人沟通偏好；不把个人偏好强加给团队成员。
+- 新增 `adapters/global-preferences.md`，说明项目级规则、工具用户级配置和独立聊天会话的生效边界。
+- 更新总控摘要、路由表、规则清单、README 与适配器索引。
+- 明确限制：GitHub 仓库中的规则文件不会自动改变未加载 Agency 的 ChatGPT / 独立会话行为。
+
+
 所有规则/规范变更记录于此。版本语义见 `rules/evolution.md`（MAJOR=破坏性，MINOR=新增，PATCH=澄清/修正）。
 
 ## v2.2.0（2026-11-20）
