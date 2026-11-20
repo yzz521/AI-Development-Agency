@@ -147,7 +147,7 @@ cmd_task()     { "$SCRIPT_DIR/task.sh" "$@"; }
 cmd_audit()    { "$SCRIPT_DIR/audit.sh" "$@"; }
 cmd_debt()     { "$SCRIPT_DIR/debt.sh" "${1:-}"; }
 cmd_review()   { "$SCRIPT_DIR/review.sh" "$@"; }
-cmd_evolve()   { "$SCRIPT_DIR/evolve.sh" "$@"; }
+cmd_evolve()   { bash "$SCRIPT_DIR/evolve.sh" "$@"; }
 cmd_validate() { "$SCRIPT_DIR/validate.sh"; }
 cmd_route()    { "$SCRIPT_DIR/route.sh" "$@"; }
 cmd_check()    { "$SCRIPT_DIR/check.sh" "$@"; }
