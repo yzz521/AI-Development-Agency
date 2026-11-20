@@ -131,8 +131,8 @@ agency check --install ~/workspace/你的项目
 # 5) 随时自查接入状态：AGENTS.md / 技能 / 门禁 / hook 哪项缺一目了然
 agency status ~/workspace/你的项目
 
-# 6) 有规则缺口/过时/违反时才记反馈（不要每次 rule_applied 走流程；自进化的起点）
-agency feedback --kind rule_gap --detail "遇到的问题"
+# 6) 规则反馈由 Agent 在任务收尾时自动检查并记录；需要时可手动查看汇总
+agency evolve
 ```
 
 > 完整日常用法见 `docs/日常使用手册.md`（含「怎么知道规范有没有被用到」和「门禁怎么做」）；校验规范库用 `agency validate`。
