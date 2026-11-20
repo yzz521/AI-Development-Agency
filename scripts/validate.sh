@@ -43,6 +43,9 @@ done
 [ -f AGENTS.md ] && ok "AGENTS.md" || fail "缺少 AGENTS.md"
 [ -f profiles/default.md ] && ok "profiles/default.md" || fail "缺少 profiles/default.md"
 [ -f rules/communication.md ] && ok "rules/communication.md" || fail "缺少 rules/communication.md"
+[ -f scripts/evolve.sh ] && ok "scripts/evolve.sh" || fail "缺少 scripts/evolve.sh"
+[ -f .github/workflows/evolution-review.yml ] && ok "evolution review workflow" || fail "缺少 evolution review workflow"
+grep -q "ACTION_REQUIRED=true" scripts/evolve.sh && ok "evolve threshold marker" || fail "evolve 缺少阈值标记"
 grep -q '^### 7\. 简单问题优先简答$' rules/communication.md && grep -q '默认用 \*\*1—3 句话\*\*' rules/communication.md && ok "communication 简答约束" || fail "communication 缺少简单问题简答约束"
 [ -f CHANGELOG.md ] && ok "CHANGELOG.md" || fail "缺少 CHANGELOG.md"
 
