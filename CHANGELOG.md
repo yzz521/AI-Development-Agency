@@ -2,6 +2,115 @@
 
 所有规则/规范变更记录于此。版本语义见 `rules/evolution.md`（MAJOR=破坏性，MINOR=新增，PATCH=澄清/修正）。
 
+## v2.1.0（2026-11-03）
+
+**code-review 增加技术栈规范逐条核对（MINOR）**
+
+问题：用户质疑「我想的是 review 的时候，为什么改的是 catalog.tsv + check.sh 这几个文件？
+code-review 对应 skill.md 不修改吗？」——v2.0.0 只加了语义维度和机器检查项，但
+**review 流程本身没有「按 Java/SQL/Vue 规范逐条核对」这个动作**：SKILL.md 第 4 步只有
+通用语义维度（正确性/事务/分层/结构/编码合理性…），code-reviewer 的必读清单里也没有
+`rules/java.md` / `rules/sqlserver.md` / `rules/vue.md`，报告模板更没有规范核对的记录位置。
+结果是 review 只跑 `agency check` + 凭经验看几眼，规则里写的东西大部分没被真正核对。
+
+- `skills/code-review/SKILL.md` 流程从 6 步扩展为 8 步，插入两个必做步骤：
+  **第 4 步「定技术栈 + 读规范全文」**——按 diff 文件扩展名映射到规则文件
+  （`*.java`/`*.kt`→`rules/java.md`、`*.sql`/`*Mapper.xml`→`rules/sqlserver.md`、
+  `*.vue`→`rules/vue.md`、`*.py`→`rules/python.md`，常驻 `rules/global.md` + `rules/security.md`），
+  **读全文而不是摘要**（摘要省略判定标准和例外条件，只看摘要审不出细节违规）；
+  **第 5 步「逐条核对规范」**——对每条规则给「符合 / 违反 / 不适用」结论，
+  违反必须带 `文件:行` 证据，并明确「不允许因为规则太多就只看机器检查结果」。
+  边界新增「不跳过规范核对」。
+- `agents/quality/code-reviewer.md` 必读清单增加第 8 项「按 diff 技术栈读取对应规则全文」；
+  工作方法从「第 0 步跑门禁 → 直接语义审查」改为「第 0 步门禁 → 第 1 步逐条核对规范
+  → 第 2 步通用语义审查」；硬性约束新增「必须读规则全文逐条核对」；
+  完成标准新增「diff 涉及技术栈的规则已逐条核对并给出结论」。
+- `artifacts/templates/code-review.md` 新增第 5 节「技术栈规范核对」
+  （5.1 核对范围表、5.2 违反项表、5.3 不适用项表、5.4 符合项汇总），
+  原第 5-7 节顺延为 6-8；检查清单新增「技术栈规范核对（review 主体，不可跳过）」三项勾选；
+  Decision 判据新增「规范核对发现阻塞级违反 → REQUEST_CHANGES」。
+- `checks/catalog.tsv` 新增 3 条辅助机器检查项（定位是**减少人工核对量**，不是替代 review）：
+  `java-log-getmessage`（on, warning）— 异常日志只打 `e.getMessage()` 丢掉堆栈，
+  两步法排除 `log.error(e.getMessage(), e)` 带异常对象的合规写法；
+  `vue-props-mutation`（on, warning）— `props.xxx =` 直接改 props，
+  用 `[^=]` 排除 `==` / `===` 比较；
+  `vue-template-role`（off, warning）— `v-if`/`v-else-if`/`v-show` 属性值里出现 `role`，
+  误报面略宽故默认关，项目按需打开。
+- `scripts/check.sh` 新增 `hit_java_log_getmessage`、`hit_vue_props_mutation`、
+  `hit_vue_template_role` 三个引擎函数并在 `run_engine` 注册。
+- `scripts/check-selftest.sh` 新增第 14-16 组用例，覆盖三个新检查项的命中与不误报两边。
+- 不做的候选（降级为逐条核对时的人工判断）：Vue 路由懒加载（写法多样，误报面宽）、
+  SQL LIMIT/OFFSET 无 ORDER BY（跨行判定，单行模式大量误报/漏报）、
+  SQL CREATE INDEX 无 ONLINE（多行 DDL，几乎全漏报）、
+  Java @Transactional 在 Controller（单行无法判断所在类）、
+  Java 依赖方向（需跨文件分析 import 图）、文件大小阈值（需统计整文件行数）。
+
+## v2.0.0（2026-11-03）
+
+**代码审核维度增强：结构 / 位置 / 编码合理性（MAJOR）**
+
+问题：用户反馈「希望能审核一下代码结构，位置，是否有编码不合理的地方？现在审核的不是太够」。
+当前 code-review 的语义审查维度（6 个）侧重正确性、事务、分层、异步四态、过度设计、规则 gap，
+对"代码结构合理性"、"文件位置/组织"、"编码合理性"三个维度覆盖不足或完全缺失。
+机器检查项（24 条）也没有"组件直连 axios"、"async 内同步阻塞"等可零歧义判定的项。
+
+本次是一次较大的审核维度扩展，按 `rules/evolution.md` 版本语义升 MAJOR。
+
+- `rules/global.md` 新增第 9-10 条：代码放正确位置（跟随已有目录结构）、编码合理性
+  （函数职责单一、重复逻辑提取但不提前抽象）。
+- `rules/java.md` 新增第 19-20 条：包结构跟随已有分层（controller/service/repository/domain/dto），
+  跨层类放独立包；单文件不超 500 行、单方法不超 80 行（人工参考阈值，非硬性门禁）。
+- `rules/vue.md` 新增第 14 条：组件文件放正确目录（views/pages → components → components/base），
+  单 .vue 文件不超 300 行。
+- `rules/python.md` 新增第 15 条：模块文件放正确目录（api/service/dao/ai 各归其位），
+  单 .py 文件不超 400 行。
+- `checks/catalog.tsv` 新增 2 条机器检查项：
+  `vue-component-axios`（on, warning）— 组件内直接 import axios/fetch，应走项目请求层；
+  `py-async-sync-call`（on, warning）— async def 内调用同步阻塞库（requests/time.sleep）。
+  另有 `java-transactional-controller` 候选项因单行增量模式无法零歧义判定所在类，未纳入机器检查，
+  改为语义审查维度覆盖。
+- `scripts/check.sh` 新增 `hit_vue_component_axios` 与 `hit_py_async_sync_call` 两个引擎函数，
+  并在 `run_engine` 中注册。
+- `skills/code-review/SKILL.md` 第 4 步语义审查从 6 个维度扩展为 9 个：
+  新增「代码结构与文件位置」「编码合理性」「安全与越权」。
+- `agents/quality/code-reviewer.md` 工作方法新增「代码结构与文件位置」「编码合理性」两个审查步骤，
+  并给出具体审查要点（目录/包/层级、文件大小阈值、命名、重复代码、嵌套层级、异常策略一致性）。
+- `artifacts/templates/code-review.md` 语义审查小节从 5 个扩展为 8 个：
+  新增 5.4 代码结构与文件位置、5.5 编码合理性、5.8 安全与越权；
+  检查清单同步新增 3 个勾选项。
+- **注意**：新增检查项属行为收紧，已有项目升级后可能出现新的 FAIL（vue-component-axios、
+  py-async-sync-call），属预期。升级方式：`agency update` + `agency check --install <项目>`。
+
+## v1.9.0（2026-10-30）
+
+**技术栈设计边界补全：事务 / 异常 / 并发 / 越权 / 依赖（MINOR）**
+
+问题：除 `spring-boot-configuration.md`（1213 行）外，各技术栈规则只有 20-35 行纲要，
+而且多数是"结论口号"而非"判定标准"——例如 java.md 原第 9 条「事务边界由业务一致性决定」
+无法据以判断对错，Agent 和 reviewer 都用不上。补的方向统一是：**能判定的才写**。
+
+- `rules/java.md` 补 8 条（11-18）：依赖方向单向；`@Transactional` 只在 Service 层、
+  事务内禁调 HTTP/RPC/MQ（长事务持锁、打空连接池）；查询 `readOnly=true`；
+  自调用/private 方法上事务注解静默失效；禁 `new Thread` / `Executors.newXxx`；
+  禁 `static SimpleDateFormat`；异常日志必须带堆栈、禁 catch 后 return null；
+  集合返回空集合不返回 null。
+- `rules/security.md` 补 6 条（7-12）：**数据归属校验**（只校验"已登录"就是越权，
+  最常见也最易漏）、SSRF 白名单、禁反序列化不可信数据、上传限类型大小并隔离路径、
+  响应体脱敏、CORS 不与 credentials 同开。
+- `rules/python.md` 补 5 条（10-14）：依赖锁精确版本 + 虚拟环境、`async def` 内禁同步阻塞
+  （`requests`/`time.sleep` 会卡死事件循环）、资源用 `with`、环境变量集中读取、
+  公开函数必须有类型注解。
+- `rules/vue.md` 补 5 条（9-13）：组件不直连 axios（统一请求层）、props 超 5 个考虑拆分、
+  **请求竞态**（快速切筛选时旧响应覆盖新数据）、路由懒加载与长列表虚拟滚动、
+  权限不硬编码在模板里。
+- `rules/sqlserver.md` 补 3 条：分页必须带确定性 `ORDER BY`、索引列上禁套函数或隐式转换、
+  大表建索引评估 `ONLINE`。
+- `checks/catalog.tsv` 新增 3 条可机器判定的（其余属人工判定，进 `skills/code-review`
+  语义审查，不进机器门禁——硬塞进去必然误报）：`java-new-thread`（warning）、
+  `java-static-simpledateformat`（error）、`java-catch-return-null`（warning，仅单行 catch）。
+- **注意**：新增检查项属行为收紧，已有项目升级后可能出现新的 FAIL，属预期。
+  升级方式：`agency update` + `agency check --install <项目>`。
+
 ## v1.8.0（2026-10-30）
 
 **Code Review 闭环：会话内拦截 + 评审流程 + 9 条检查项（MINOR）**
