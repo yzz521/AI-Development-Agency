@@ -19,7 +19,9 @@ AI Development Agency 不是新的 AI Coding Runtime，也不是把多个 Agent 
 | Context   | 在什么背景下做 | `context/`            |
 | Evolution | 怎么进化       | `evolution/` + `rules/evolution.md` |
 | Skill     | 轻量场景即调即走 | `skills/`            |
-| Profile   | 用户主动加载的个人偏好 | `profiles/` |
+
+
+可选扩展：Profile（`profiles/`）保存个人偏好，只有用户主动加载后生效，不属于团队强制规则。
 
 核心关系：
 
