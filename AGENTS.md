@@ -1,4 +1,4 @@
-# AI Development Agency — 总控规则 v2.2.0
+# AI Development Agency — 总控规则 v2.3.0
 
 <!-- agency-pin:begin -->
 ## 写代码前（钉死，勿删）
