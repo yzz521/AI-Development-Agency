@@ -7,7 +7,7 @@
 2. 只加载命中规则的摘要；**写代码时**命中的语言/领域规则必须再打开文内「原文路径」（摘要会丢掉约束）。探测任务 `opened=none`。
 3. 回复第一行：
    `agency-route: matched=<id,id> risk=L2 rules=rules/java.md opened=rules/java.md source=agents.md`
-4. 常驻红线：先读再改；最小改动；密钥不进源码；SQL 参数化。
+4. 常驻红线：先读再改；最小改动；回答先结论、表达直接清楚；密钥不进源码；SQL 参数化。
 5. 汇报：L1 三行；L2 短汇报；L3 完整表。业务仓无规则缺口则不写 feedback。
 6. 强制靠 `agency check`（只卡增量）。存量用 `agency check --all` 做台账，不进 hook。
 <!-- agency-pin:end -->
@@ -186,6 +186,15 @@
 - API 必须认证、授权和输入校验。
 
 原文路径：`rules/security.md`（项目内通常是 `.ai/agency/rules/security.md`）
+
+### rules/communication.md
+- 先回答问题，再解释原因；只回答当前问题，不重复、不铺垫。
+- 使用简洁、自然、易懂的语言；专业术语首次出现时简短解释。
+- 按重要性组织：结论 → 必要依据 → 可执行步骤 / 风险；简单问题短答，复杂问题再结构化。
+- 明确区分事实、推断和未知；只有关键缺口阻碍执行时才提一个澄清问题。
+- 不虚构执行结果；交付任务先给结果，再说明验证和风险。
+
+原文路径：`rules/communication.md`（项目内通常是 `.ai/agency/rules/communication.md`）
 
 ### rules/java.md
 - 语言与框架版本以项目 `AGENTS.md` 和构建文件为准，不在中央库写死。
