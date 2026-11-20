@@ -21,6 +21,7 @@
 #   agency feedback ...            记录规则使用反馈（自进化采集层）
 #   agency propose ...             创建规则/规范改进提案（自进化提案层）
 #   agency review                  生成本轮评审简报（自进化评审层）
+   agency evolve [--days 30]       自动汇总近期反馈并判断是否触发评审
 #   agency validate                校验规范库完整性（自进化守门）
 #   agency changelog               查看版本变更记录
 #   agency version                 查看当前规范版本
@@ -146,6 +147,7 @@ cmd_task()     { "$SCRIPT_DIR/task.sh" "$@"; }
 cmd_audit()    { "$SCRIPT_DIR/audit.sh" "$@"; }
 cmd_debt()     { "$SCRIPT_DIR/debt.sh" "${1:-}"; }
 cmd_review()   { "$SCRIPT_DIR/review.sh" "$@"; }
+cmd_evolve()   { bash "$SCRIPT_DIR/evolve.sh" "$@"; }
 cmd_validate() { "$SCRIPT_DIR/validate.sh"; }
 cmd_route()    { "$SCRIPT_DIR/route.sh" "$@"; }
 cmd_check()    { "$SCRIPT_DIR/check.sh" "$@"; }
@@ -180,6 +182,7 @@ case "$cmd" in
   audit)                 cmd_audit "${1:-}";;
   debt)                  cmd_debt "${1:-}";;
   review)                cmd_review;;
+  evolve)                cmd_evolve "$@";;
   validate)              cmd_validate;;
   changelog)             cmd_changelog;;
   update)                cmd_update;;

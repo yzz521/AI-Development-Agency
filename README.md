@@ -1,7 +1,7 @@
 # AI Development Agency
 
 > 面向企业软件研发的 AI 虚拟研发团队规范库。  
-> 当前版本：**v2.3.1**
+> 当前版本：**v2.4.0**
 
 AI Development Agency 不是新的 AI Coding Runtime，也不是把多个 Agent 强行绑定在一起的框架。
 
@@ -131,8 +131,8 @@ agency check --install ~/workspace/你的项目
 # 5) 随时自查接入状态：AGENTS.md / 技能 / 门禁 / hook 哪项缺一目了然
 agency status ~/workspace/你的项目
 
-# 6) 有规则缺口/过时/违反时才记反馈（不要每次 rule_applied 走流程；自进化的起点）
-agency feedback --kind rule_gap --detail "遇到的问题"
+# 6) 规则反馈由 Agent 在任务收尾时自动检查并记录；需要时可手动查看汇总
+agency evolve
 ```
 
 > 完整日常用法见 `docs/日常使用手册.md`（含「怎么知道规范有没有被用到」和「门禁怎么做」）；校验规范库用 `agency validate`。
@@ -459,16 +459,19 @@ agency-curator 评审合并（evolution-review workflow）
 
 ## 15. 规则自进化（Evolution）
 
-使用不再是一次性的：每次任务完成后按硬规则记录反馈（`agency feedback`），缺口升级为提案（`agency propose`），agency-curator 按 `workflows/evolution-review.md` 评审合并，版本与变更记录在 `CHANGELOG.md`。闭环：
+任务收尾时 Agent 自动自检并记录真实问题；`agency evolve` 与每周 GitHub Actions 自动汇总，达到阈值时创建评审 Issue；Curator 核验证据、形成提案并通过 PR 交付，人工审核合并。闭环：
 
 ```text
-使用 → 反馈 → 提案 → 评审 → 合并 → 版本化 → 再使用
+任务 → 自动反馈 → 定时汇总/提醒 → Curator 核验与提案 → PR → 人工合并 → 版本化 → 再使用
 ```
 
 - 治理规则：`rules/evolution.md`
 - 评审角色：`agents/leadership/agency-curator.md`
 - 评审流程：`workflows/evolution-review.md`
-- 日常命令：`agency`（`scripts/agency.sh`），详见 `docs/日常使用手册.md`
+- 日常命令：`agency feedback`（Agent 自动调用）、`agency evolve`（自动汇总）、`agency review`（评审简报）
+- 定时汇总：`.github/workflows/evolution-review.yml`，每周检查最近 30 天反馈，达阈值创建 GitHub Issue
+- GitHub Actions 只负责统计与提醒；语义分析由 Curator 完成，规则修改通过 PR，默认不自动合并
+- 详见 `docs/日常使用手册.md`
 
 ## 15.1 让技能在各智能体里真正生效
 

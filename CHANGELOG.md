@@ -1,5 +1,16 @@
 # Changelog
 
+## v2.4.0（2026-11-20）
+
+**自进化反馈采集与定期汇总自动化（MINOR）**
+
+- `agency-feedback` 从用户手动触发改为 Agent 在每个任务收尾时自动检查；发现真实缺口、过时、违反或流程/上下文问题时自行调用 `agency feedback` 落盘，无问题不写反馈。
+- 新增 `agency evolve` / `scripts/evolve.sh`，统计最近 N 天反馈，按 `rule_stale` 或累计 3 条可改进反馈触发评审。
+- 新增每周 GitHub Actions 工作流，上传报告；达到阈值时创建 GitHub Issue，并避免存在未关闭提醒时重复创建。
+- 更新 Evolution 治理规则、Curator、评审 Workflow、README 和日常手册。
+- 保留边界：定时任务只做统计和提醒，不调用未配置的模型 API；语义归并由 Curator 完成；规则变更通过 PR，不自动合并。
+
+
 ## v2.3.1（2026-11-20）
 
 **简单问题优先简答（PATCH）**
