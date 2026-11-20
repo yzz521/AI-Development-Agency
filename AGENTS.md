@@ -132,7 +132,7 @@
 1. 对照下面的信号表：任务关键词或将要改的文件。
 2. **只加载命中行的规则摘要**（本段已内嵌裁剪后的摘要）。
 3. 摘要不够再打开原文；不要把未命中的语言规范整篇塞进上下文。
-4. 每次都生效：`rules/global.md` + `rules/minimalism.md` + `rules/security.md`。
+4. 每次都生效：`rules/global.md` + `rules/minimalism.md` + `rules/security.md` + `rules/communication.md`。
 5. 写代码回复的第一行必须是路由回执（给人核对有没有触发、有没有打开原文）：
    `agency-route: matched=<id,id> risk=L2 rules=rules/java.md opened=rules/java.md source=agents.md`
 
