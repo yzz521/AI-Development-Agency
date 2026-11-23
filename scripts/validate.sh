@@ -53,7 +53,7 @@ else
   cat /tmp/agency-evolve-selftest.log >&2 || true
 fi
 
-# 2. CLI 防回归：帮助文本、递归风险、init 参数透传和 Shell 语法
+# CLI 防回归：帮助文本、递归风险、init 参数透传和 Shell 语法
 if bash scripts/agency-selftest.sh >/tmp/agency-selftest.log 2>&1; then
   ok "agency-selftest"
 else
