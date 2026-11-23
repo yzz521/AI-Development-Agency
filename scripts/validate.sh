@@ -52,6 +52,14 @@ else
   fail "evolve-selftest 失败（见 /tmp/agency-evolve-selftest.log）"
   cat /tmp/agency-evolve-selftest.log >&2 || true
 fi
+
+# 2. CLI 防回归：帮助文本、递归风险、init 参数透传和 Shell 语法
+if bash scripts/agency-selftest.sh >/tmp/agency-selftest.log 2>&1; then
+  ok "agency-selftest"
+else
+  fail "agency-selftest 失败（见 /tmp/agency-selftest.log）"
+  cat /tmp/agency-selftest.log >&2 || true
+fi
 grep -q '^### 7\. 简单问题优先简答$' rules/communication.md && grep -q '默认用 \*\*1—3 句话\*\*' rules/communication.md && ok "communication 简答约束" || fail "communication 缺少简单问题简答约束"
 [ -f CHANGELOG.md ] && ok "CHANGELOG.md" || fail "缺少 CHANGELOG.md"
 
