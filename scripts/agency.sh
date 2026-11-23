@@ -21,7 +21,7 @@
 #   agency feedback ...            记录规则使用反馈（自进化采集层）
 #   agency propose ...             创建规则/规范改进提案（自进化提案层）
 #   agency review                  生成本轮评审简报（自进化评审层）
-   agency evolve [--days 30]       自动汇总近期反馈并判断是否触发评审
+#   agency evolve [--days 30]       自动汇总近期反馈并判断是否触发评审
 #   agency validate                校验规范库完整性（自进化守门）
 #   agency changelog               查看版本变更记录
 #   agency version                 查看当前规范版本
@@ -170,7 +170,7 @@ case "$cmd" in
   version|-v)            cmd_version;;
   status|doctor)         cmd_status "${1:-}";;
   check|gate)            cmd_check "$@";;
-  init)                  cmd_init "${1:-}";;
+  init)                  cmd_init "$@";;
   list|ls)               cmd_list "${1:-}";;
   use)                   cmd_use "${1:-}" "${2:-}";;
   route)                 cmd_route "$@";;
